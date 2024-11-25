@@ -60,6 +60,7 @@ class PS_Controller extends CI_Controller
     $this->mc = $this->load->database('mc', TRUE); //--- Temp Database
 
     $dataDate = getConfig('DATA_DATE');
+    
     if( ! empty($dataDate))
     {
       $this->_dataDate = $dataDate;
