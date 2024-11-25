@@ -1,0 +1,110 @@
+.table-right tr td {
+  padding:3px;
+}
+
+.input-group-addon {
+  border:0 !important;
+  background: none !important;
+}
+
+.freez > th {
+  top:0;
+  position: sticky;
+  background-color: lightsalmon;
+  min-height: 30px;
+  height: 60px;
+}
+
+.tableFixHead {
+  table-layout: fixed;
+  min-width: 100%;
+  /*margin-top:-1px;
+  margin-left:-1px;
+  margin-right:0px;*/
+  margin-bottom: 0;
+}
+
+.tableFixHead thead th {
+  position: sticky;
+  top: -1px;
+  background-color:#f2f2f2;
+  font-size: 14px;
+}
+
+.tableFixHead tr > td {
+  padding: 3px !important;
+}
+
+.fix-header {
+  z-index: 2;
+}
+
+select.input-xs {
+  padding: 0px 6px;
+  border-radius: 0;
+}
+
+td > select.input-xs {
+  border:none;
+}
+
+td > input.input-xs, td > input.input-xs:disabled {
+  color:#393939;
+  background-color: transparent !important;
+  font-size: 11px;
+  border:none;
+}
+
+.active-row > td{
+  /* color:#393939; */
+  background-color:#d1e7f5;
+  font-size: 11px;
+}
+
+
+.pg-footer {
+  z-index: 100;
+  position: fixed;
+  bottom: 15px;
+  left:0px;
+}
+
+.pg-footer-inner .pg-footer-content {
+  height: 200px;
+  border:solid 1px #ccc;
+  border-radius: 0px;
+  background-color: #f2f2f2;
+  padding: 8px;
+  padding-top:15px;
+  padding-bottom: 15px;
+  line-height: 20px;
+}
+
+.pos-btn {
+  height: 60px;
+  font-size: 12px;
+  font-family: sarabun;
+}
+
+.pos-payment-btn {
+  height: 50px;
+  font-size: 12px;
+  font-family: sarabun;
+}
+
+.slip-table {
+  table-layout: fixed;
+  margin-top: 0;
+  margin-bottom: 10px;
+  width: 100%;
+  border: 0;
+  font-size: 9px;
+}
+
+.slip-table > thead > tr > th {
+  border-bottom:solid 1px #DDD;
+}
+
+.form-group {
+  margin-bottom: 5px !important;
+}

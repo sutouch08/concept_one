@@ -1,0 +1,74 @@
+{
+    "order_number": "WR-24050001",
+    "type": "WR",
+    "receive_date": "2024-05-29 12:24:51",
+    "reference" : "RTN21-07-0372",
+    "details": [
+        {
+            "item_sku": "WA-FTT-FBM0100-YD-XS",
+            "received_qty": 10,
+        },
+        {
+            "item_sku": "WA-FTT-FBM0100-YD-S",
+            "received_qty": 20
+        },
+        {
+            "item_sku": "WA-FTT-FBM0100-YD-M",
+            "received_qty": 5
+        },
+        {
+            "item_sku": "WA-FTT-FBM0100-YD-L",
+            "item_qty": 5,
+            "received_qty": 5
+        },
+        {
+            "item_sku": "WA-FTT-FBM0100-YD-XL",
+            "received_qty": 5
+        }
+    ]
+}
+
+
+{
+    "order_number": "WR-24050006",
+    "type": "WR",
+    "id": "66",
+    "reference" : "RTN21-07-0372",
+    "status": "Pending",
+    "receive_date": "2024-05-29 21:04:35",
+    "details": [
+        {
+            "item_code": "00200468",
+            "item_number": "WS-SGK504-AA-F",
+            "item_sku": "WS-SGK504-AA-F",
+            "item_name": "สนับแข้งเด็ก WS-1504K-พิมพ์ลาย สีดำ-AA-F",
+            "item_lot": "119100060",
+            "item_qty": 10,
+            "received_qty": 9,
+            "putaway_status": "Pending",
+            "comment": ""
+        },
+        {
+            "item_code": "00200469",
+            "item_number": "WS-SGK504-BB-F",
+            "item_sku": "WS-SGK504-BB-F",
+            "item_name": "สนับแข้งเด็ก WS-1504K-พิมพ์ลาย สีน้ำเงิน-BB-F",
+            "item_lot": "119100060",
+            "item_qty": 10,
+            "received_qty": 10,
+            "putaway_status": "Pending",
+            "comment": ""
+        },
+        {
+            "item_code": "00200471",
+            "item_number": "WS-SGK504-OO-F",
+            "item_sku": "WS-SGK504-OO-F",
+            "item_name": "สนับแข้งเด็ก WS-1504K-พิมพ์ลาย สีส้ม-OO-F",
+            "item_lot": "119100060",
+            "item_qty": 10,
+            "received_qty": 10,
+            "putaway_status": "Pending",
+            "comment": ""
+        }
+    ]
+}
