@@ -37,6 +37,8 @@ $page .= $this->printer->doc_header($name);
 
 $tax_rate = getConfig('SALE_VAT_RATE');
 
+
+
 $logo_path = base_url()."images/form-logo.png";
 
 

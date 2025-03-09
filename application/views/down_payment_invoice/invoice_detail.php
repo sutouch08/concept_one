@@ -18,10 +18,10 @@
             <a href="javascript:sendToSap('<?php echo $doc->code; ?>')"><i class="fa fa-send"></i> Export to SAP</a>
           </li>
           <li class="primary">
-            <a href="javascript:printDownPaymentInvoice('<?php echo $doc->code; ?>', 'RTI')"><i class="fa fa-print"></i> ใบเสร็จรับเงิน/ใบกำกับภาษี</a>
+            <a href="javascript:printDownPaymentInvoice('<?php echo $doc->code; ?>', 'RTI')"><i class="fa fa-print"></i> ใบรับมัดจำ/ใบกำกับภาษี</a>
           </li>
           <li class="primary">
-            <a href="javascript:printDownPaymentInvoice('<?php echo $doc->code; ?>', 'RTIN')"><i class="fa fa-print"></i> ใบเสร็จรับเงิน/ใบกำกับภาษี (ไม่แสดงวันที่)</a>
+            <a href="javascript:printDownPaymentInvoice('<?php echo $doc->code; ?>', 'RTIN')"><i class="fa fa-print"></i> ใบรับมัดจำ/ใบกำกับภาษี (ไม่แสดงวันที่)</a>
           </li>
         <?php if($this->pm->can_delete) : ?>
           <li class="danger">

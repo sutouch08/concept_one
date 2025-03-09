@@ -13,7 +13,23 @@
       <?php if($this->pm->can_delete) : ?>
         <button type="button" class="btn btn-white btn-danger btn-top" onclick="getCancel(<?php echo $order->id; ?>, '<?php echo $order->code; ?>')"><i class="fa fa-times"></i> ยกเลิก</button>
       <?php endif; ?>
-      <button type="button" class="btn btn-white btn-success btn-top" onclick="sendToSap('<?php echo $order->code; ?>')"><i class="fa fa-send"></i> Send to SAP</button>
+      <div class="btn-group">
+        <button data-toggle="dropdown" class="btn btn-success btn-white dropdown-toggle margin-top-5" aria-expanded="false">
+          <i class="ace-icon fa fa-send icon-on-left"></i>
+          Export
+          <i class="ace-icon fa fa-angle-down icon-on-right"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+          <li>
+            <a href="javascript:sendToSap('<?php echo $order->code; ?>')"><i class="fa fa-print"></i> Export Invoice</a>
+          </li>
+          <?php if($order->BaseType == 'POS') : ?>
+            <li>
+              <a href="javascript:exportIncomming('<?php echo $order->BaseRef; ?>', '<?php echo $order->BaseType; ?>')"><i class="fa fa-print"></i> Export Incomming</a>
+            </li>
+          <?php endif; ?>
+        </ul>
+      </div>
       <div class="btn-group">
         <button data-toggle="dropdown" class="btn btn-info btn-white dropdown-toggle margin-top-5" aria-expanded="false">
           <i class="ace-icon fa fa-print icon-on-left"></i>
@@ -154,27 +170,39 @@
 		<input type="text" class="form-control input-sm text-center h" maxlength="12" id="postcode" value="<?php echo $order->postcode; ?>" disabled/>
 	</div>
   <div class="divider"></div>
-  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
+  <div class="col-lg-1-harf col-md-3 col-sm-3  padding-5">
     <label>สร้างจาก</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $order->BaseRef; ?>" readonly />
   </div>
-  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
+  <div class="col-lg-1-harf col-md-3 col-sm-3  padding-5">
     <label>ใบสั่งขาย</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $order->so_code; ?>" readonly />
   </div>
-  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
+  <div class="col-lg-1-harf col-md-3 col-sm-3  padding-5">
     <label>บิลขาย</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $order->bill_code; ?>" readonly />
   </div>
-  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
+  <div class="col-lg-1-harf col-md-3 col-sm-3  padding-5">
     <label>ออเดอร์</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $order->order_code; ?>" readonly />
   </div>
-  <div class="col-lg-1-harf col-md-1-harf col-sm-1-harf  padding-5">
+  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
     <label>SAP No.</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo $order->DocNum; ?>" readonly />
   </div>
-  <div class="col-lg-1-harf col-md-1-harf col-sm-2  padding-5">
+  <div class="col-lg-1-harf col-md-2 col-sm-2  padding-5">
+    <label>Incomming No.</label>
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $order->IncommingNo; ?>" readonly />
+  </div>
+  <div class="col-lg-1 col-md-2 col-sm-2  padding-5">
+    <label>Incomming</label>
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $order->incomming_exported; ?>" readonly />
+  </div>
+  <div class="col-lg-1 col-md-2 col-sm-2  padding-5">
+    <label>Invoice</label>
+    <input type="text" class="form-control input-sm text-center" value="<?php echo $order->isExported; ?>" readonly />
+  </div>
+  <div class="col-lg-1 col-md-2 col-sm-2  padding-5">
     <label>สถานะ</label>
     <input type="text" class="form-control input-sm text-center" value="<?php echo bill_status_label($order->status); ?>" readonly />
   </div>

@@ -413,8 +413,8 @@ class Down_payment_invoice extends PS_Controller
     $this->load->helper('print');
 
     $title = array(
-      'RTI' => 'ใบรับมัดจำ/ใบกำกับภาษี',
-      'RTIN' => 'ใบรับมัดจำ/ใบกำกับภาษี', //-- no date
+      'RTI' => 'ใบรับเงินมัดจำ/ใบกำกับภาษี',
+      'RTIN' => 'ใบรับเงินมัดจำ/ใบกำกับภาษี', //-- no date
     );
 
     $doc = $this->down_payment_invoice_model->get($code);

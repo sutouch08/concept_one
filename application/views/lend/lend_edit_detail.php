@@ -88,6 +88,8 @@ $hide = $order->status == 1 ? 'hide' : '';
 <?php $this->load->view('lend/lend_detail');  ?>
 
 
+<input type="hidden" id="auz" value="<?php echo getConfig('ALLOW_UNDER_ZERO'); ?>">
+
 <form id="orderForm">
 <div class="modal fade" id="orderGrid" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 	<div class="modal-dialog" id="modal" style="max-width:95%;">

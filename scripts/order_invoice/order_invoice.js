@@ -81,7 +81,7 @@ function getCancel(id, code) {
     $('#cancle-code').val(code);
 
     $('#cancle-modal').on('shown.bs.modal', () => {
-      $('#cancle-reason').focus();
+      $('#cancel-reason').focus();
     });
 
     $('#cancle-modal').modal('show');
@@ -91,16 +91,16 @@ function getCancel(id, code) {
 
 function doCancle() {
   let id = $('#cancle-id').val();
-  let reason = $.trim($('#cancle-reason').val());
+  let reason = $.trim($('#cancel-reason').val());
 
   if(reason.length < 10 ) {
     $('#cancle-error').text('กรุณาระบุเหตุผลอย่างน้อย 10 ตัวอักษร');
-    $('#cancle-reason').addClass('has-error');
+    $('#cancel-reason').addClass('has-error');
     $('#cancle-error').removeClass('hide');
     return false;
   }
   else {
-    $('#cancle-reason').removeClass('has-error');
+    $('#cancel-reason').removeClass('has-error');
     $('#cancle-error').addClass('hide');
   }
 
@@ -160,6 +160,35 @@ function sendToSap(code) {
 
   $.ajax({
     url: HOME + 'send_to_sap/' + code,
+    type:'POST',
+    cache:false,
+    success:function(rs) {
+      load_out();
+
+      if(rs == 'success') {
+        swal({
+          title:'Success',
+          text:'Export success',
+          type:'success',
+          timer:1000
+        });
+      }
+      else {
+        swal({
+          title:'Error',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
+}
+
+function exportIncomming(code, type) {
+  load_in();
+
+  $.ajax({
+    url: HOME + 'export_incomming/' + code + '/'+type,
     type:'POST',
     cache:false,
     success:function(rs) {

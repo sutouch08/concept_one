@@ -1174,6 +1174,7 @@ class Order_invoice extends PS_Controller
                   if($sc === TRUE)
                   {
                     $this->load->library('export');
+                    $this->export->export_incomming($order->code, 'POS');
                     $this->export->export_invoice($code);
                   }
                 }
@@ -1794,6 +1795,7 @@ class Order_invoice extends PS_Controller
                   if($sc === TRUE)
                   {
                     $this->load->library('export');
+                    $this->export->export_incomming($order->code, 'POS');
                     $this->export->export_invoice($code);
                   }
                 }
@@ -2762,6 +2764,21 @@ class Order_invoice extends PS_Controller
   }
 
 
+  public function export_incomming($code, $type ='POS')
+  {
+    $sc = TRUE;
+    $this->load->library('export');
+
+    if( ! $this->export->export_incomming($code, $type))
+    {
+      $sc = FALSE;
+      $this->error = $this->export->error;
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
   private function do_export($code)
   {
     $sc = TRUE;
@@ -2799,6 +2816,7 @@ class Order_invoice extends PS_Controller
 
     return $dpmInvData;
   }
+
 
   public function print_invoice($invoice_code, $option = '')
   {
@@ -2839,12 +2857,13 @@ class Order_invoice extends PS_Controller
 
       $details = $this->order_invoice_model->get_details_by_code($invoice_code);
 
-      //---- ต้องการเลขที่ใบกำกับภาษีเงินมัดจำ จากเอกสารรับเงินมัดจำ เพื่อไปดึงยอดรับเงินมัดจำจาก ODPI
-      $dpm = $this->get_dpm_by_base_ref($order->BaseRef);
-
       $dpmAmount = 0;
       $dpmVatSum = 0;
 
+      //---- ต้องการเลขที่ใบกำกับภาษีเงินมัดจำ จากเอกสารรับเงินมัดจำ เพื่อไปดึงยอดรับเงินมัดจำจาก ODPI
+      //--$dpm = $this->get_dpm_by_base_ref($order->BaseRef);
+      $dpm = $this->down_payment_invoice_model->get_invoice_by_base_ref($order->BaseRef);
+      
       if( ! empty($dpm))
       {
         foreach($dpm as $dp)

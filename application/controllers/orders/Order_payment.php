@@ -329,7 +329,7 @@ class Order_payment extends PS_Controller
 
         if($sc === TRUE)
         {
-          $order = $this->orders_model->get($detail->order_code);
+          $order = $this->orders_model->get($pm->order_code);
 
           if(empty($order))
           {
@@ -343,7 +343,7 @@ class Order_payment extends PS_Controller
             $this->db->trans_begin();
 
             //--- mark order as unpaid
-            if( ! $this->orders_model->update($detail->order_code, array('is_paid' => 0)))
+            if( ! $this->orders_model->update($pm->order_code, array('is_paid' => 0)))
             {
               $sc = FALSE;
               $this->error = "Failed to rollback paid status";
@@ -352,7 +352,7 @@ class Order_payment extends PS_Controller
     				if($sc === TRUE && $order->state != 8 && $order->state != 9)
     				{
     	        //--- change state to pending
-    	        if( ! $this->orders_model->change_state($detail->order_code, 1))
+    	        if( ! $this->orders_model->change_state($pm->order_code, 1))
               {
                 $sc = FALSE;
                 $this->error = "Failed to change order state";
@@ -361,7 +361,7 @@ class Order_payment extends PS_Controller
               {
                 //--- add state event
                 $arr = array(
-                  'order_code' => $detail->order_code,
+                  'order_code' => $pm->order_code,
                   'state' => 1,
                   'update_user' => get_cookie('uname')
                 );

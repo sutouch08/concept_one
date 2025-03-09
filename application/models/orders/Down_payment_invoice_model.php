@@ -64,6 +64,22 @@ class Down_payment_invoice_model extends CI_Model
   }
 
 
+  public function get_invoice_by_base_ref($baseRef)
+  {
+    $rs = $this->db
+    ->where('BaseRef', $baseRef)
+    ->where('status !=', 'D')
+    ->get($this->tb);
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
   //---- ODPI
   public function get_down_payments_by_array(array $codes = array())
   {
@@ -435,7 +451,7 @@ class Down_payment_invoice_model extends CI_Model
   }
 
 
-  public function get_sylc_list($limit = 100)
+  public function get_sync_list($limit = 100)
   {
     $rs = $this->db
     ->select('code')

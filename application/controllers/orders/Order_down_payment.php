@@ -387,6 +387,7 @@ class Order_down_payment extends PS_Controller
     $this->_response($sc);
   }
 
+
   public function export_incomming()
   {
     $sc = TRUE;
@@ -411,7 +412,7 @@ class Order_down_payment extends PS_Controller
 
             if( ! empty($payments))
             {
-              if( ! $this->export->export_incomming($code))
+              if( ! $this->export->export_incomming($code, 'DP'))
               {
                 $sc = FALSE;
                 $this->error = $this->export->error;

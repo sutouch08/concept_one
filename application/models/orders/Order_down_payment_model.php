@@ -606,7 +606,7 @@ class Order_down_payment_model extends CI_Model
   }
 
 
-  public function get_sylc_list($limit = 100)
+  public function get_sync_list($limit = 100)
   {
     $rs = $this->db
     ->select('code')

@@ -132,7 +132,7 @@ function date_to_array($date1, $date2, $format = 'Y-m-d' )
     $current = strtotime($stepVal, $current);
   }
 
-  return $dates;
+  return $dates;      
 }
 
 
@@ -141,7 +141,7 @@ function select_years($se = '')
 	$sc 		= '';
 	$length	= 5;
 	$startYear = getConfig('START_YEAR');
-  $y = ($se === '' OR $sc === NULL OR $se == 'all') ? $startYear : $se;
+  $y = ($se === '' OR $sc === NULL) ? $startYear : $se;
 	$year = ($y - $length) < $startYear ? $startYear : $y - $length;
 	$lastYear = date('Y') + $length;
 	while( $year <= $lastYear )

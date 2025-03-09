@@ -372,9 +372,10 @@ $('#input-qty').keyup(function(e){
 //---- เพิ่มรายการสินค้าเช้าออเดอร์
 function addItemToOrder() {
   $('#stock-qty').removeClass('has-error');
+  let auz = $('#auz').val();
 	var orderCode = $('#order_code').val();
 	var qty = parseDefault(parseInt($('#input-qty').val()), 0);
-	var limit = parseDefault(parseInt($('#stock-qty').val()), 0);
+	var limit = auz == '1' ? 100000 : parseDefault(parseInt($('#stock-qty').val()), 0);
 	var itemCode = $('#item-code').val();
   var data = [{'code':itemCode, 'qty' : qty}];
 
@@ -383,7 +384,7 @@ function addItemToOrder() {
     return false;
   }
 
-  
+
 	if(qty > 0 && qty <= limit) {
 		load_in();
 		$.ajax({

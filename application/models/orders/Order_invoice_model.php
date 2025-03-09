@@ -341,10 +341,17 @@
 
     public function get_order_non_inv_code($limit = 100)
     {
+      $sync_days = getConfig('INVOICE_SYNC_DAYS');
+      $sync_days = empty($sync_days) ? 30 : $sync_days;
+      $end_date = date('Y-m-d H:i:s', strtotime("-{$sync_days} days"));
+
       $rs = $this->db
       ->select('code')
       ->where('status', 'O')
+      ->where('isExported', 'Y')
       ->where('DocNum IS NULL', NULL, FALSE)
+      ->where('shipped_date >', $end_date)
+      ->order_by('last_sync', 'ASC')
       ->limit($limit)
       ->get($this->tb);
 

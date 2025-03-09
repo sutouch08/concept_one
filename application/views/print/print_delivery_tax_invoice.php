@@ -1,20 +1,8 @@
 <?php
 
 $total_row 	= empty($details) ? 0 :count($details);
-$row_span = 3;
-$row = 9;
-
-if($order->DiscSum > 0 || $dpmAmount == 0)
-{
-	$row_span++;
-	$row--;
-}
-
-if( $dpmAmount > 0)
-{
-	$row_span++;
-	$row--;
-}
+$row_span = 6;
+$row = 6;
 
 $config 		= array(
 	"row" => $row,
@@ -39,8 +27,6 @@ $this->iprinter->add_title($title);
 //--- รายการพวกนี้ไม่มีการบันทึกขาย ใช้การโอนสินค้าเข้าคลังแต่ละประเภท
 //--- ฝากขาย โอนเข้าคลังฝากขาย เบิกแปรสภาพ เข้าคลังแปรสภาพ  ยืม เข้าคลังยืม
 //--- รายการที่จะพิมพ์ต้องเอามาจากการสั่งสินค้า เปรียบเทียบ กับยอดตรวจ ที่เท่ากัน หรือ ตัวที่น้อยกว่า
-
-$subtotal_row = 4;
 
 
 $row 		     = $this->iprinter->row;
@@ -248,13 +234,7 @@ while($total_page > 0 )
     $qty  = "<b>*** จำนวนรวม  ".number($total_qty)."  หน่วย ***</b>";
 		$totalBfDisc = number($total_amount, 2);
 		$billDiscAmount = number($order->DiscSum, 2);
-		// $total_vat_amount = number($order->VatSum, 2);
-		// $totalBfTax = $order->vat_type == 'E' ? ($order->DocTotal - $order->VatSum) - $order->DiscSum : remove_vat($order->DocTotal);
-		// $totalBfTax = number($totalBfTax, 2);
-		// $net_amount = number($order->DocTotal, 2);
-    // $remark = "";
-		// $baht_text = "(".baht_text($order->DocTotal).")";
-
+		$totalAfDisc = number($total_amount - $order->DiscSum, 2);
 		$dpm_amount = number($dpmAmount, 2);
 		$total_vat_amount = number($order->VatSum - $dpmVatSum, 2);
 		$docTotal = $order->DocTotal - $dpmAmount;
@@ -270,6 +250,7 @@ while($total_page > 0 )
 		$totalBfDisc = "";
 		$totalBfTax = "";
 		$billDiscAmount = "";
+		$totalAfDisc = "";
 		$total_vat_amount = "";
 		$net_amount = "";
     $remark = "";
@@ -283,59 +264,63 @@ while($total_page > 0 )
 	$sub_price .= 'ใบเสร็จรับเงินนี้จะสมบูรณ์ต่อเมื่อมีลายเซ็นผู้รับมอบอำนาจและลายเซ็นผู้รับเงิน และได้เรียกเก็บเงินตามเข็คเรียบร้อยแล้ว';
 	$sub_price .= '<span style="width:30mm; position:absolute; bottom:1px; left:40mm;">ผิด ตก ยกเว้น E & O.E.</span>';
 	$sub_price .= '</td>';
-  $sub_price .= '<td style="width:50mm; border-top:solid 1px #333; padding:3px 8px 3px 8px">';
+  $sub_price .= '<td style="width:50mm; border-top:solid 1px #333; padding:1px 8px">';
   $sub_price .=  '<strong>รวมเป็นเงิน</strong>';
 	$sub_price .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Gross Amount</span>';
   $sub_price .= '</td>';
-  $sub_price .= '<td class="middle text-right" style="width:29.7mm; border:solid 1px #333; border-right:0;  border-bottom:0; padding:3px 8px 3px 8px">';
+  $sub_price .= '<td class="middle text-right" style="width:29.7mm; border:solid 1px #333; border-right:0;  border-bottom:0; padding:1px 8px">';
   $sub_price .=  $totalBfDisc;
   $sub_price .= '</td>';
   array_push($subTotal, array($sub_price));
 
-	if( $order->DiscSum > 0 || $dpmAmount == 0)
-	{
-		//--- ส่วนลดท้ายบิล
-		$sub_disc  = '<td style="border:0px; padding:3px 8px 3px 8px">';
-		$sub_disc .=  '<strong>หักส่วนลด</strong>';
-		$sub_disc .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Less Discount</span>';
-		$sub_disc .= '</td>';
-		$sub_disc .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0px; border-top:0px; padding:3px 8px 3px 8px">';
-		$sub_disc .=  $billDiscAmount;
-		$sub_disc .= '</td>';
-		array_push($subTotal, array($sub_disc));
+	//--- ส่วนลดท้ายบิล
+	$sub_disc  = '<td style="border:0px; padding:1px 8px">';
+	$sub_disc .=  '<strong>หักส่วนลด</strong>';
+	$sub_disc .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Less Discount</span>';
+	$sub_disc .= '</td>';
+	$sub_disc .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0px; border-top:0px; padding:1px 8px">';
+	$sub_disc .=  $billDiscAmount;
+	$sub_disc .= '</td>';
+	array_push($subTotal, array($sub_disc));
 
-	}
 
-	if( $dpmAmount > 0)
-	{
-		//--- หักมัดจำ
-		$sub_dpm  = '<td style="border:0px; padding:3px 8px 3px 8px">';
-		$sub_dpm .=  '<strong>หักมัดจำ</strong>';
-		$sub_dpm .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Less Discount</span>';
-		$sub_dpm .= '</td>';
-		$sub_dpm .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0px; border-top:0px; padding:3px 8px 3px 8px">';
-		$sub_dpm .=  $dpm_amount;
-		$sub_dpm .= '</td>';
-		array_push($subTotal, array($sub_dpm));
-	}
+	//--- ส่วนลดท้ายบิล
+	$sub_disc  = '<td style="border:0px; padding:1px 8px">';
+	$sub_disc .=  '<strong>ยอดหลังหักส่วนลด</strong>';
+	$sub_disc .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Total</span>';
+	$sub_disc .= '</td>';
+	$sub_disc .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0px; border-top:0px; padding:1px 8px">';
+	$sub_disc .=  $totalAfDisc;
+	$sub_disc .= '</td>';
+	array_push($subTotal, array($sub_disc));
+
+	//--- หักมัดจำ
+	$sub_dpm  = '<td style="border:0px; padding:1px 8px">';
+	$sub_dpm .=  '<strong>หักมัดจำ</strong>';
+	$sub_dpm .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Downpayment</span>';
+	$sub_dpm .= '</td>';
+	$sub_dpm .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0px; border-top:0px; padding:1px 8px">';
+	$sub_dpm .=  $dpm_amount;
+	$sub_dpm .= '</td>';
+	array_push($subTotal, array($sub_dpm));
 
 	//--- มูลค่าหลังส่วนลด ก่อนภาษี
-  $sub_disc  = '<td style="border:0; padding:3px 8px 3px 8px">';
+  $sub_disc  = '<td style="border:0; padding:1px 8px">';
   $sub_disc .=  '<strong>มูลค่าสินค้า</strong>';
 	$sub_disc .=  '<span style="display:block; font-size:8px; margin-top:-4px;">Total Invoice</span>';
   $sub_disc .= '</td>';
-  $sub_disc .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0; border-top:0; padding:3px 8px 3px 8px">';
+  $sub_disc .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-bottom:0; border-top:0; padding:1px 8px">';
   $sub_disc .=  $totalBfTax;
   $sub_disc .= '</td>';
   array_push($subTotal, array($sub_disc));
 
   //--- ภาษี
 	$taxType = $order->vat_type == 'E' ? '(Exclude)' : '(Include)';
-  $sub_vat  = '<td style="border:0; border-bottom:solid 1px #333; padding:3px 8px 3px 8px">';
+  $sub_vat  = '<td style="border:0; border-bottom:solid 1px #333; padding:1px 8px">';
   $sub_vat .=  '<strong>ภาษีมูลค่าเพิ่ม &nbsp;&nbsp; 7%  <span style="font-size:9px;">&nbsp;&nbsp;'.$taxType.'</span></strong>';
 	$sub_vat .=  '<span style="display:block; font-size:8px; margin-top:-4px;">VAT</span>';
   $sub_vat .= '</td>';
-  $sub_vat .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-top:0; padding:3px 8px 3px 8px">';
+  $sub_vat .= '<td class="middle text-right" style="border:solid 1px #333; border-right:0; border-top:0; padding:1px 8px">';
   $sub_vat .=  $total_vat_amount;
   $sub_vat .= '</td>';
   array_push($subTotal, array($sub_vat));

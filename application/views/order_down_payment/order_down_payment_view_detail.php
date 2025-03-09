@@ -16,7 +16,7 @@
 					<i class="ace-icon fa fa-angle-down icon-on-right"></i>
 				</button>
 				<ul class="dropdown-menu dropdown-menu-right">
-				<?php if($doc->TaxStatus == 'N' OR empty($doc->invoice_code)) : ?>
+				<?php if((is_true(getConfig('ALLOW_CREATE_DOWN_PAYMENT_INVOICE'))) && ($doc->TaxStatus == 'N' OR empty($doc->invoice_code))) : ?>
 					<li class="purple">
 						<a href="javascript:createInvoice('<?php echo $doc->code; ?>')"><i class="fa fa-plus"></i> เปิดใบกำกับภาษี</a>
 					</li>

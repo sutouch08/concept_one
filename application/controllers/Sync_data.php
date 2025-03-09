@@ -405,7 +405,7 @@ class Sync_data extends CI_Controller
             'DocNum' => $DocNum
           );
 
-          $this->order_down_payment_model->update_by_code($rs->code, $arr)
+          $this->order_down_payment_model->update_by_code($rs->code, $arr);
 
           $update++;
         }
@@ -425,7 +425,7 @@ class Sync_data extends CI_Controller
   }
 
 
-  //---- sync incomming ORCT
+  //---- sync ODPI
   public function syncDownPaymentCode()
   {
     $this->load->model('orders/down_payment_invoice_model');
@@ -450,7 +450,7 @@ class Sync_data extends CI_Controller
             'DocNum' => $Dpm->DocNum
           );
 
-          $this->down_payment_invoice_model->update_by_code($rs->code, $arr)
+          $this->down_payment_invoice_model->update_by_code($rs->code, $arr);
 
           $update++;
         }
@@ -478,7 +478,7 @@ class Sync_data extends CI_Controller
     $count = 0;
     $update = 0;
 
-    if(!empty($ds))
+    if( ! empty($ds))
     {
       foreach($ds as $rs)
       {
@@ -490,14 +490,24 @@ class Sync_data extends CI_Controller
         {
           $arr = array(
             'status' => 'C',
-            'DocNum' => $inv
+            'DocNum' => $inv,
+            'last_sync' => now()
           );
 
           if($this->order_invoice_model->update($rs->code, $arr))
           {
             $this->order_invoice_model->update_details($rs->code, array('LineStatus' => 'C'));
           }
+
           $update++;
+        }
+        else
+        {
+          $arr = array(
+            'last_sync' => now()
+          );
+
+          $this->order_invoice_model->update($rs->code, $arr);
         }
       }
     }

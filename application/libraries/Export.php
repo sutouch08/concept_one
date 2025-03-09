@@ -282,25 +282,37 @@ class Export
         $currency = getConfig('CURRENCY');
         $vat_code = getConfig('SALE_VAT_CODE');
         $vat_type = $order->vat_type;
-				$date_add =
         $address = parseAddress($order->address, $order->sub_district, $order->district, $order->province, $order->postcode);
         $payment_type = "";
         $payment_type .= "หักมัดจำ : ".$order->downPaymentAmount;
+        $payments = [];
 
         if($order->BaseType == 'POS')
         {
-          $payment = $this->ci->order_pos_payment_model->get_payments($order->BaseRef);
+          $payments[] = $order->BaseRef;
 
-          if( ! empty($payment))
+          $dpc = $this->ci->order_down_payment_model->get_invoice_by_target($order->BaseRef);
+
+          if( ! empty($dpc))
           {
-            foreach($payment as $pm)
+            foreach($dpc as $dpd)
             {
-              $payment_type .= ",".$pm->role_name." : ".$pm->amount;
+              $payments[] = $dpd->code;
             }
           }
         }
         else
         {
+          $dpc = $this->ci->order_down_payment_model->get_invoice_by_target($order->BaseRef);
+
+          if( ! empty($dpc))
+          {
+            foreach($dpc as $dpd)
+            {
+              $payments[] = $dpd->code;
+            }
+          }
+
           $payment_type .= ",เงินโอน : ".$this->ci->order_payment_model->get_amount($order->BaseRef);
         }
 
@@ -329,6 +341,7 @@ class Export
           'DocDueDate' => sap_date($order->DocDueDate,TRUE), //--- วันที่เอกสาร
           'CardCode' => $order->CardCode, //--- รหัสลูกค้า
           'CardName' => $order->CardName, //--- ชื่อลูกค้า
+          'PayToCode' => $order->branch_code,
           'Address' => get_null($address),
           'NumAtCard' => get_null($order->NumAtCard),
           'LicTradNum' => get_null($order->tax_id),
@@ -360,7 +373,10 @@ class Export
           'U_TAX_STATUS' => $order->TaxStatus,
           'U_POSNO' => $this->ci->pos_model->get_code($order->pos_id),
           'U_PAYMENTTYPE' => $payment_type,
-          'U_OLDTAX' => $order->code
+          'U_OLDTAX' => $order->code,
+          'U_Incomming1' => (empty($payments[0]) ? NULL : $payments[0]),
+          'U_Incomming2' => (empty($payments[1]) ? NULL : $payments[1]),
+          'U_Incomming3' => (empty($payments[2]) ? NULL : $payments[2])
         );
 
         $this->ci->mc->trans_begin();
@@ -3269,6 +3285,7 @@ class Export
           'CardCode' => $doc->CardCode, //--- รหัสลูกค้า
           'CardName' => $doc->CardName, //--- ชื่อลูกค้า
           'LicTradNum' => get_null($doc->tax_id),
+          'PayToCode' => $doc->branch_code,
           'Address' => parseAddress($doc->address, $doc->sub_district, $doc->district, $doc->province, $doc->postcode),
           'NumAtCard' => $doc->BaseDpm.'/'.$doc->BaseRef,
           'DiscPrcnt' => $doc->DiscPrcnt,
@@ -3280,8 +3297,11 @@ class Export
           'VatPercent' => 0.00,
           'VatSum' => $doc->VatSum,
           'SlpCode' => $doc->SlpCode,
-          'Comments' => $doc->BaseDpm.'/'.$doc->BaseRef,
+          'Comments' => $doc->BaseDpm,
           'U_ECOMNO' => $doc->code,
+          'U_OLDTAX' => $doc->code,
+          'U_SONO' => $doc->BaseRef,
+          'U_TEL' => $doc->phone,
           'F_E_Commerce' => $option,
           'F_E_CommerceDate' => sap_date(now(), TRUE)
         );
@@ -3377,16 +3397,27 @@ class Export
   }
 
 
-  //---Export Incomming ORCT
-  public function export_incomming($code, $option = 'A')
+  //---Export Incomming ORCT for POS
+  public function export_incomming($code, $type = 'DP')
   {
     //-- option 'A' = Aadd , U = 'update'
     $sc = TRUE;
+    $this->ci->load->model('orders/order_invoice_model');
     $this->ci->load->model('orders/order_down_payment_model');
+    $this->ci->load->model('orders/order_pos_model');
     $this->ci->load->model('orders/order_pos_payment_model');
     $this->ci->load->model('masters/bank_model');
 
-    $doc = $this->ci->order_down_payment_model->get($code);
+    $doc = NULL;
+
+    if($type == 'POS')
+    {
+      $doc = $this->ci->order_pos_model->get($code);
+    }
+    else if($type == 'DP')
+    {
+      $doc = $this->ci->order_down_payment_model->get($code);
+    }
 
     if( ! empty($doc))
     {
@@ -3418,7 +3449,7 @@ class Export
 
               $customer_name = $doc->customer_name;
 
-              if($doc->customer_ref != "" OR $doc->customer_ref != NULL OR $doc->customer_ref != "-")
+              if( ! empty($doc->customer_ref) && $doc->customer_ref != "" && $doc->customer_ref != NULL && $doc->customer_ref != "-")
               {
                 $customer_name = $doc->customer_ref;
               }
@@ -3462,6 +3493,8 @@ class Export
                 }
               }
 
+              $pf = $type == 'DP' ? "มัดจำ" : "รับเงิน";
+
               $arr = array(
                 'DocDate' => sap_date($doc->date_add),
                 'DocDueDate' => sap_date($doc->date_add),
@@ -3477,12 +3510,12 @@ class Export
                 'TrsfrDate' => $transDate,
                 'DocCurr' => $currency,
                 'DocTotal' => $doc->amount,
-                'Ref1' => $doc->code,
-                'Ref2' => $doc->reference,
-                'Comments' => "มัดจำ {$customer_name}",
-                'JrnlMemo' => "มัดจำ {$doc->code} : {$doc->reference} : {$customer_name}",
+                'Ref1' => NULL,
+                'Ref2' => $doc->code, //$type == 'DP' ? $doc->reference : $doc->so_code,
+                'Comments' => $customer_name,
+                'JrnlMemo' => "{$doc->code}". ($type == 'DP' ? " : {$doc->reference}" : (empty($doc->so_code) ? NULL : " : {$doc->so_code}")). " : {$customer_name}",
                 'U_ECOMNO' => $doc->code,
-                'F_E_Commerce' => $option,
+                'F_E_Commerce' => 'A',
                 'F_E_CommerceDate' => sap_date(now(), TRUE)
               );
 
@@ -3525,25 +3558,50 @@ class Export
               {
                 $this->ci->mc->trans_commit();
 
-                $arr = array(
-                  'DocNum' => NULL,
-                  'is_exported' => 1,
-                  'export_error' => NULL
-                );
+                if($type == 'DP')
+                {
+                  $arr = array(
+                    'DocNum' => NULL,
+                    'is_exported' => 1,
+                    'export_error' => NULL
+                  );
 
-                $this->ci->order_down_payment_model->update($doc->id, $arr);
+                  $this->ci->order_down_payment_model->update($doc->id, $arr);
+                }
+
+                if($type == 'POS')
+                {
+                  $arr = array(
+                    'incomming_exported' => 'Y'
+                  );
+
+                  $this->ci->order_invoice_model->update($doc->invoice_code, $arr);
+                }
+
               }
               else
               {
                 $this->ci->mc->trans_rollback();
 
-                $arr = array(
-                  'DocNum' => NULL,
-                  'is_exported' => 3,
-                  'export_error' => $this->error
-                );
+                if($type == 'DP')
+                {
+                  $arr = array(
+                    'DocNum' => NULL,
+                    'is_exported' => 3,
+                    'export_error' => $this->error
+                  );
 
-                $this->ci->order_down_payment_model->update($doc->id, $arr);
+                  $this->ci->order_down_payment_model->update($doc->id, $arr);
+                }
+
+                if($type == 'POS')
+                {
+                  $arr = array(
+                    'incomming_exported' => 'E'
+                  );
+
+                  $this->ci->order_invoice_model->update($doc->invoice_code, $arr);
+                }
               }
             } //-- if delete temp success
           } //--- if ! empty($payment)
