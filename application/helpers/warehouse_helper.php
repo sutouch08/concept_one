@@ -29,7 +29,7 @@ function select_warehouse($se = 0)
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code.' | '.$rs->name.'</option>';
     }
   }
 
@@ -51,7 +51,7 @@ function select_sell_warehouse($se = NULL)
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code.' | '.$rs->name.'</option>';
     }
   }
 
@@ -89,12 +89,20 @@ function select_common_warehouse($se = NULL)
 	{
 		foreach($option as $rs)
 		{
-			$sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->name.'</option>';
+			$sc .= '<option value="'.$rs->code.'" '.is_selected($se, $rs->code).'>'.$rs->code.' | '.$rs->name.'</option>';
 		}
 	}
 
 	return $sc;
 }
 
+
+function warehouse_name($code)
+{
+  $ci =& get_instance();
+  $ci->load->model('masters/warehouse_model');
+
+  return $ci->warehouse_model->get_name($code);
+}
 
  ?>

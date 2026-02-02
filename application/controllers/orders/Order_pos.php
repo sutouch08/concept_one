@@ -556,6 +556,18 @@ class Order_pos extends PS_Controller
       {
         $this->load->model('masters/payment_methods_model');
         $this->load->helper('payment_method');
+        $pos->account_id = NULL;
+
+        if( ! empty($pos->transfer_payment))
+        {
+          $transfer_payment = $this->payment_methods_model->get($pos->transfer_payment);
+
+          if( ! empty($transfer_payment))
+          {
+            $pos->account_id = $transfer_payment->account_id;
+          }
+        }
+
 
         $order = $this->order_pos_model->get_active_temp($pos->id);
 
@@ -1703,6 +1715,7 @@ class Order_pos extends PS_Controller
 
     $pos_id = $this->input->post('pos_id');
     $temp_id = $this->input->post('temp_id');
+    $acc_id = $this->input->post('acc_id');
     $amountBfDisc = $this->input->post('amountBfDisc');
     $discPrcnt = $this->input->post('discPrcnt');
     $discAmount = $this->input->post('discAmount');
@@ -1792,7 +1805,7 @@ class Order_pos extends PS_Controller
             'changed' => $change,
             'WhtPrcnt' => $whtPrcnt,
             'WhtAmount' => $whtAmount,
-            'acc_id' => $temp->payment_role == 2 ? $pos->account_id : NULL,
+            'acc_id' => $temp->payment_role == 2 ? $acc_id : NULL,
             'warehouse_code' => $pos->warehouse_code,
             'zone_code' => $pos->zone_code,
             'uname' => $this->_user->uname,
@@ -2106,7 +2119,7 @@ class Order_pos extends PS_Controller
                     'pos_id' => $pos->id,
                     'amount' => $transferAmount,
                     'payment_role' => 2,
-                    'acc_id' => $pos->account_id,
+                    'acc_id' => $acc_id,
                     'user' => $this->_user->uname,
                     'round_id' => $pos->round_id
                   );
@@ -2857,6 +2870,7 @@ class Order_pos extends PS_Controller
           $vatSum = 0;
           $downPayment = empty($order->so_code) ? 0.00 : $this->order_down_payment_model->get_sum_amount_by_reference($order->so_code);
           $amountAfterDiscAndTax = 0;
+          $amountAfterDisc = 0;
           $docTotal = 0;
 
 
@@ -2921,6 +2935,7 @@ class Order_pos extends PS_Controller
           'totalQty' => $totalQty,
           'totalBfDisc' => $totalBfDisc,
           'vatSum' => $vatSum,
+          'amountAfterDisc' => $amountAfterDisc,
           'amountAfterDiscAndTax' => $amountAfterDiscAndTax,
           'downPayment' => $downPayment,
           'docTotal' => $docTotal - $downPayment

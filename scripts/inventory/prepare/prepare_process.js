@@ -1,6 +1,5 @@
 
-//--- จัดสินค้า ตัดยอดออกจากโซน เพิ่มเข้า buffer
-function doPrepare(){
+function doPrepare() {
   var order_code = $("#order_code").val();
   var zone_code = $("#zone_code").val();
   var barcode = $("#barcode-item").val();
@@ -74,13 +73,6 @@ function doPrepare(){
 }
 
 
-
-
-
-
-
-
-//---- จัดเสร็จแล้ว
 function finishPrepare(){
   var order_code = $("#order_code").val();
   $.ajax({
@@ -104,9 +96,6 @@ function finishPrepare(){
 }
 
 
-
-
-
 function forceClose(){
   swal({
     title: "Are you sure ?",
@@ -127,37 +116,31 @@ function forceClose(){
 //---- เมื่อมีการยิงบาร์โค้ดโซน เพื่อระบุว่าจะจัดสินค้าออกจากโซนนี้
 $("#barcode-zone").keyup(function(e){
   if(e.keyCode == 13){
-    if( $(this).val() != ""){
+    let zoneCode = $(this).val().trim();
+
+    if( zoneCode != "") {
       $.ajax({
         url: BASE_URL + 'masters/zone/get_zone_code',
         type:"GET",
         cache:"false",
         data:{
-          "barcode" : $(this).val()
+          "barcode" : zoneCode
         },
-        success: function(rs){
-            var rs = $.trim(rs);
-            if(rs != 'not_exists'){
-              $("#zone_code").val(rs);
-              $("#barcode-zone").attr('disabled', 'disabled');
-              $("#qty").removeAttr('disabled');
-              $("#barcode-item").removeAttr('disabled');
-              $("#btn-submit").removeAttr('disabled');
-
-              $("#qty").focus();
-              $("#qty").select();
-            }else{
-              beep();
-              swal("Error!", 'โซนไม่ถูกต้อง', "error");
-              $("#zone_code").val('');
-            }
+        success:function(rs) {
+          if(rs.trim() != 'not_exists') {
+            $("#zone_code").val(rs);
+            $('#barcode-item').val('').focus();
+          }
+          else {
+            beep();
+            showError("โซนไม่ถูกต้อง");
+            $("#zone_code").val('');
+          }
         }
       });
     }
   }
 });
-
-
 
 
 $('.b-click').click(function(){
@@ -167,28 +150,21 @@ $('.b-click').click(function(){
     $('#barcode-item').val(barcode);
     $('#barcode-item').focus();
   }
-
 });
 
 
 function changeZone(){
   $("#zone_code").val('');
   $("#barcode-item").val('');
-  $("#barcode-item").attr('disabled','disabled');
   $("#qty").val(1);
-  $("#qty").attr('disabled', 'disabled');
-  $("#btn-submit").attr('disabled', 'disabled');
   $("#barcode-zone").val('');
-  $("#barcode-zone").removeAttr('disabled');
   $("#barcode-zone").focus();
 }
 
 
-
-
 //---- ถ้าใส่จำนวนไม่ถูกต้อง
 $("#qty").keyup(function(e){
-  if( e.keyCode == 13){
+  if( e.keyCode == 13) {
     if(! isNaN($(this).val())){
       $("#barcode-item").focus();
     }else{
@@ -224,8 +200,6 @@ function toggleForceClose(){
 $(function () {
   $('.btn-pop').popover({html:true});
 });
-
-
 
 
 $("#showZone").change(function(){

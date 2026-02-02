@@ -821,7 +821,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function update_with_holding_tax()
   {
     $sc = TRUE;
@@ -997,21 +996,20 @@ class Orders extends PS_Controller
   }
 
 
-
   public function remove_detail($id)
   {
-		$sc = TRUE;
+    $sc = TRUE;
     $detail = $this->orders_model->get_detail($id);
 
-		if(!empty($detail))
-		{
-			$order = $this->orders_model->get($detail->order_code);
+    if(!empty($detail))
+    {
+      $order = $this->orders_model->get($detail->order_code);
 
-			if(! empty($order))
-			{
-				//--- อนุญาติให้ลบได้แค่ 2 สถานะ
-				if($order->state == 1 OR $order->state == 3)
-				{
+      if(! empty($order))
+      {
+        //--- อนุญาติให้ลบได้แค่ 2 สถานะ
+        if($order->state == 1 OR $order->state == 3)
+        {
           if( ! $this->orders_model->remove_detail($id))
           {
             $sc = FALSE;
@@ -1055,47 +1053,46 @@ class Orders extends PS_Controller
               $this->error = "Failed to update doc total amount";
             }
           }
-				}
-				else
-				{
-					$sc = FALSE;
-					$this->error = "Delete failed : Invalid order status";
-				}
-			}
-			else
-			{
-				$sc = FALSE;
-				$this->error = "Order not found";
-			}
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Item not found";
-		}
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "Delete failed : Invalid order status";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Order not found";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Item not found";
+    }
 
-		echo $sc === TRUE ? 'success' : $this->error;
-
+    echo $sc === TRUE ? 'success' : $this->error;
   }
 
 
   public function remove_details()
   {
-		$sc = TRUE;
+    $sc = TRUE;
 
     $code = $this->input->post('code');
 
     $ids = json_decode($this->input->post('ids'));
 
-		if( ! empty($ids))
-		{
-			$order = $this->orders_model->get($code);
+    if( ! empty($ids))
+    {
+      $order = $this->orders_model->get($code);
 
-			if( ! empty($order))
-			{
-				//--- อนุญาติให้ลบได้แค่ 2 สถานะ
-				if($order->state == 1 OR $order->state == 3)
-				{
+      if( ! empty($order))
+      {
+        //--- อนุญาติให้ลบได้แค่ 2 สถานะ
+        if($order->state == 1 OR $order->state == 3)
+        {
           if( ! $this->orders_model->remove_details($ids))
           {
             $sc = FALSE;
@@ -1110,12 +1107,12 @@ class Orders extends PS_Controller
               $this->transform_model->remove_transform_details($ids);
             }
           }
-				}
-				else
-				{
-					$sc = FALSE;
-					$this->error = "Delete failed : Invalid order status";
-				}
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "Delete failed : Invalid order status";
+        }
 
         if($sc === TRUE)
         {
@@ -1133,23 +1130,21 @@ class Orders extends PS_Controller
             $this->error = "Failed to update doc total amount";
           }
         }
-			}
-			else
-			{
-				$sc = FALSE;
-				$this->error = "Order not found";
-			}
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Item not found";
-		}
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Order not found";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Item not found";
+    }
 
-		echo $sc === TRUE ? 'success' : $this->error;
-
+    echo $sc === TRUE ? 'success' : $this->error;
   }
-
 
 
   public function edit_order($code)
@@ -1473,7 +1468,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function edit_detail($code)
   {
     $this->load->helper('product_tab');
@@ -1491,7 +1485,6 @@ class Orders extends PS_Controller
       $this->load->view('orders/order_edit_detail', $ds);
     }
   }
-
 
 
   public function save($code)
@@ -1566,9 +1559,9 @@ class Orders extends PS_Controller
             $vatAmount = round(get_vat_amount($totalAfDisc, $rs->vat_rate, $vat_type), 6);
 
             $arr = array(
-              'avgBillDiscAmount' => $avgBillDiscAmount,
-              'sumBillDiscAmount' => $sumBillDiscAmount,
-              'vat_amount' => $vatAmount
+            'avgBillDiscAmount' => $avgBillDiscAmount,
+            'sumBillDiscAmount' => $sumBillDiscAmount,
+            'vat_amount' => $vatAmount
             );
 
             if( ! $this->orders_model->update_detail($rs->id, $arr) )
@@ -2022,11 +2015,10 @@ class Orders extends PS_Controller
   }
 
 
-
-	public function get_order_grid()
+  public function get_order_grid()
   {
-		$sc = TRUE;
-		$ds = array();
+    $sc = TRUE;
+    $ds = array();
     //----- Attribute Grid By Clicking image
     $style = $this->product_style_model->get_with_old_code($this->input->get('style_code'));
 
@@ -2040,38 +2032,37 @@ class Orders extends PS_Controller
           $warehouse = get_null($this->input->get('warehouse_code'));
           $zone = get_null($this->input->get('zone_code'));
           $view = $this->input->get('isView') == '0' ? FALSE : TRUE;
-        	$table = $this->getOrderGrid($style->code, $view, $warehouse, $zone);
-        	$tableWidth	= $this->products_model->countAttribute($style->code) == 1 ? 200 : $this->getOrderTableWidth($style->code);
+          $table = $this->getOrderGrid($style->code, $view, $warehouse, $zone);
+          $tableWidth	= $this->products_model->countAttribute($style->code) == 1 ? 200 : $this->getOrderTableWidth($style->code);
 
-					if($table == 'notfound') {
-						$sc = FALSE;
-						$this->error = "not found";
-					}
-					else
-					{
+          if($table == 'notfound') {
+            $sc = FALSE;
+            $this->error = "not found";
+          }
+          else
+          {
             $tbs = '<table class="table table-bordered border-1" style="min-width:'.$tableWidth.'px;">';
             $tbe = '</table>';
-						$ds = array(
-							'status' => 'success',
-							'message' => NULL,
-							'table' => $tbs.$table.$tbe,
-							'tableWidth' => $tableWidth + 40,
-							'styleCode' => $style->code,
-							'styleOldCode' => $style->old_code,
-							'styleName' => $style->name
-						);
-					}
+            $ds = array(
+              'status' => 'success',
+              'message' => NULL,
+              'table' => $tbs.$table.$tbe,
+              'tableWidth' => $tableWidth + 40,
+              'styleCode' => $style->code,
+              'styleOldCode' => $style->old_code,
+              'styleName' => $style->name
+            );
+          }
         }
         else
         {
-					$sc = FALSE;
+          $sc = FALSE;
           $this->error = "สินค้า Inactive";
         }
-
       }
       else
       {
-				$sc = FALSE;
+        $sc = FALSE;
         $this->error = "รหัสซ้ำ ";
 
         foreach($style as $rs)
@@ -2079,18 +2070,15 @@ class Orders extends PS_Controller
           $this->error .= " : {$rs->code} : {$rs->old_code}";
         }
       }
-
     }
     else
     {
       $sc = FALSE;
-			$this->error = "not found";
+      $this->error = "not found";
     }
 
-
-		echo $sc === TRUE ? json_encode($ds) : $this->error;
+    echo $sc === TRUE ? json_encode($ds) : $this->error;
   }
-
 
 
   public function get_item_grid()
@@ -2175,26 +2163,25 @@ class Orders extends PS_Controller
   }
 
 
-
   public function getOrderGrid($style_code, $view = FALSE, $warehouse = NULL, $zone = NULL)
-	{
-		$sc = '';
+  {
+    $sc = '';
     $style = $this->product_style_model->get($style_code);
     if(!empty($style))
     {
       if($style->active)
       {
         $isVisual = $style->count_stock == 1 ? FALSE : TRUE;
-    		$attrs = $this->getAttribute($style->code);
+        $attrs = $this->getAttribute($style->code);
 
-    		if( count($attrs) == 1  )
-    		{
-    			$sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse, $zone);
-    		}
-    		else if( count( $attrs ) == 2 )
-    		{
-    			$sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse, $zone);
-    		}
+        if( count($attrs) == 1  )
+        {
+          $sc .= $this->orderGridOneAttribute($style, $attrs[0], $isVisual, $view, $warehouse, $zone);
+        }
+        else if( count( $attrs ) == 2 )
+        {
+          $sc .= $this->orderGridTwoAttribute($style, $isVisual, $view, $warehouse, $zone);
+        }
       }
       else
       {
@@ -2207,16 +2194,14 @@ class Orders extends PS_Controller
       $sc = 'notfound';
     }
 
-		return $sc;
-	}
-
+    return $sc;
+  }
 
 
   public function showStock($qty)
 	{
 		return $this->filter == 0 ? $qty : ($this->filter < $qty ? $this->filter : $qty);
 	}
-
 
 
   public function orderGridOneAttribute($style, $attr, $isVisual, $view, $warehouse = NULL, $zone = NULL)
@@ -2291,11 +2276,8 @@ class Orders extends PS_Controller
 	}
 
 
-
-
-
   public function orderGridTwoAttribute($style, $isVisual, $view, $warehouse = NULL, $zone = NULL)
-	{
+  {
     $auz = getConfig('ALLOW_UNDER_ZERO');
 
     $overStock = getConfig('ORDER_OVER_STOCK') == 1 ? TRUE : FALSE;
@@ -2305,77 +2287,72 @@ class Orders extends PS_Controller
       $isVisual = $view === TRUE ? $isVisual : TRUE;
     }
 
-		$colors	= $this->getAllColors($style->code);
-		$sizes 	= $this->getAllSizes($style->code);
-		$sc 		= '';
-		//$sc 		.= '<table class="table table-bordered">';
-		$sc 		.= $this->gridHeader($colors);
+    $colors	= $this->getAllColors($style->code);
+    $sizes 	= $this->getAllSizes($style->code);
+    $sc 		= '';
+    //$sc 		.= '<table class="table table-bordered">';
+    $sc 		.= $this->gridHeader($colors);
 
-		foreach( $sizes as $size_code => $size )
-		{
+    foreach( $sizes as $size_code => $size )
+    {
       $bg_color = '';
-			$sc 	.= '<tr style="font-size:12px; '.$bg_color.'">';
-			$sc 	.= '<td class="text-center middle"><strong>'.$size_code.'</strong></td>';
+      $sc 	.= '<tr style="font-size:12px; '.$bg_color.'">';
+      $sc 	.= '<td class="text-center middle"><strong>'.$size_code.'</strong></td>';
 
-			foreach( $colors as $color_code => $color )
-			{
+      foreach( $colors as $color_code => $color )
+      {
         $item = $this->products_model->get_item_by_color_and_size($style->code, $color_code, $size_code);
 
-				if( !empty($item) )
-				{
-					$active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
+        if( !empty($item) )
+        {
+          $active	= $item->active == 0 ? 'Disactive' : ( $item->can_sell == 0 ? 'Not for sell' : ( $item->is_deleted == 1 ? 'Deleted' : TRUE ) );
 
-					$stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
-					$qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse, $zone) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
-					//$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
+          $stock	= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->stock_model->get_stock($item->code) )  : 0 ) : 0; //---- สต็อกทั้งหมดทุกคลัง
+          $qty 		= $isVisual === FALSE ? ( $active == TRUE ? $this->showStock( $this->get_sell_stock($item->code, $warehouse, $zone) ) : 0 ) : FALSE; //--- สต็อกที่สั่งซื้อได้
+          //$disabled  = $isVisual === TRUE  && $active == TRUE ? '' : ( ($active !== TRUE OR $qty < 1 ) ? 'disabled' : '');
           $disabled  = ($isVisual OR $overStock) && $active == TRUE ? '' : ( ($active !== TRUE OR ($qty < 1 && $overStock == FALSE)) ? 'disabled' : '');
 
-					if( $qty < 1 && $active === TRUE )
-					{
-						$txt = '<span class="font-size-12 red">Sold out</span>';
-					}
-					else
-					{
-						$txt = $active === TRUE ? '' : '<span class="font-size-12 blue">'.$active.'</span>';
-					}
+          if( $qty < 1 && $active === TRUE )
+          {
+            $txt = '<span class="font-size-12 red">Sold out</span>';
+          }
+          else
+          {
+            $txt = $active === TRUE ? '' : '<span class="font-size-12 blue">'.$active.'</span>';
+          }
 
-					$available = $qty === FALSE && $active === TRUE ? '' : ( ($qty < 1 || $active !== TRUE ) ? $txt : number($qty));
-					$limit = $qty === FALSE OR $overStock === TRUE ? 1000000 : $qty;
-
-
-					$sc 	.= '<td class="order-grid">';
-          $sc .= $view === TRUE ? '<center><span <span class="font-size-10" style="color:#ccc;">'.$color_code.'-'.$size_code.'</span></center>' : '';
-					$sc 	.= $isVisual === FALSE ? '<center><span class="font-size-10 blue pointer" onClick="viewStock(\''.$item->code.'\')">('.number($stock).')</span></center>' : '';
-
-          if( $view === FALSE)
-					{
-						$sc .= '<input type="number" min="1" max="'.$limit.'" ';
-            $sc .= 'class="form-control text-center order-grid" ';
-            $sc .= 'name="qty['.$item->color_code.']['.$item->code.']" ';
-            $sc .= 'id="qty_'.$item->code.'" ';
-            $sc .= 'placeholder="'.$color_code.'-'.$size_code.'" ';
-            $sc .= 'onkeyup="valid_qty($(this), '.$limit.')" '.$disabled.' />';
-					}
-
-					$sc 	.= $isVisual === FALSE ? '<center>'.$available.'</center>' : '';
-					$sc 	.= '</td>';
-				}
-				else
-				{
-					$sc .= '<td class="order-grid middle">N/A</td>';
-				}
-			} //--- End foreach $colors
-
-			$sc .= '</tr>';
-		} //--- end foreach $sizes
-	//$sc .= '</table>';
-	return $sc;
-	}
+          $available = $qty === FALSE && $active === TRUE ? '' : ( ($qty < 1 || $active !== TRUE ) ? $txt : number($qty));
+          $limit = $qty === FALSE OR $overStock === TRUE ? 1000000 : $qty;
 
 
+          $sc 	.= '<td class="order-grid">';
+            $sc .= $view === TRUE ? '<center><span <span class="font-size-10" style="color:#ccc;">'.$color_code.'-'.$size_code.'</span></center>' : '';
+            $sc 	.= $isVisual === FALSE ? '<center><span class="font-size-10 blue pointer" onClick="viewStock(\''.$item->code.'\')">('.number($stock).')</span></center>' : '';
 
+            if( $view === FALSE)
+            {
+              $sc .= '<input type="number" min="1" max="'.$limit.'" ';
+              $sc .= 'class="form-control text-center order-grid" ';
+              $sc .= 'name="qty['.$item->color_code.']['.$item->code.']" ';
+              $sc .= 'id="qty_'.$item->code.'" ';
+              $sc .= 'placeholder="'.$color_code.'-'.$size_code.'" ';
+              $sc .= 'onkeyup="valid_qty($(this), '.$limit.')" '.$disabled.' />';
+            }
 
+            $sc 	.= $isVisual === FALSE ? '<center>'.$available.'</center>' : '';
+            $sc 	.= '</td>';
+          }
+          else
+          {
+            $sc .= '<td class="order-grid middle">N/A</td>';
+          }
+        } //--- End foreach $colors
 
+        $sc .= '</tr>';
+      } //--- end foreach $sizes
+
+      return $sc;
+    }
 
 
   public function getAttribute($style_code)
@@ -2396,9 +2373,6 @@ class Orders extends PS_Controller
   }
 
 
-
-
-
   public function gridHeader(array $colors)
   {
     $sc = '<tr class="font-size-12"><td class="fix-width-80">&nbsp;</td>';
@@ -2411,9 +2385,6 @@ class Orders extends PS_Controller
 
     return $sc;
   }
-
-
-
 
 
   public function getAllColors($style_code)
@@ -2432,8 +2403,6 @@ class Orders extends PS_Controller
 	}
 
 
-
-
   public function getAllSizes($style_code)
 	{
 		$sc = array();
@@ -2447,7 +2416,6 @@ class Orders extends PS_Controller
 		}
 		return $sc;
 	}
-
 
 
   public function getSizeColor($size_code)
@@ -2488,7 +2456,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function get_new_code($date)
   {
     $date = $date == '' ? date('Y-m-d') : $date;
@@ -2512,7 +2479,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function print_order_sheet_barcode($code)
   {
     $this->load->model('masters/products_model');
@@ -2534,6 +2500,7 @@ class Orders extends PS_Controller
     $ds['details'] = $details;
     $this->load->view('print/print_order_sheet_barcode', $ds);
   }
+
 
   public function print_order_sheet($code)
   {
@@ -2607,8 +2574,6 @@ class Orders extends PS_Controller
   }
 
 
-
-
   public function get_detail_table($order_code)
   {
     $sc = "no data found";
@@ -2670,44 +2635,43 @@ class Orders extends PS_Controller
 
   public function get_pay_amount()
   {
-		$sc = TRUE;
-		$ds = array();
+    $sc = TRUE;
+    $ds = array();
 
     if($this->input->get('order_code'))
     {
-			$order = $this->orders_model->get($this->input->get('order_code'));
+      $order = $this->orders_model->get($this->input->get('order_code'));
 
-			if(!empty($order))
-			{
-				//--- ยอดรวมหลังหักส่วนลด ตาม item
-	      $amount = $this->orders_model->get_order_total_amount($order->code);
+      if(!empty($order))
+      {
+        //--- ยอดรวมหลังหักส่วนลด ตาม item
+        $amount = $this->orders_model->get_order_total_amount($order->code);
 
-	      //--- ส่วนลดท้ายบิล
-	      $bDisc = $order->bDiscAmount;
+        //--- ส่วนลดท้ายบิล
+        $bDisc = $order->bDiscAmount;
 
-	      $pay_amount = $amount - $bDisc;
+        $pay_amount = $amount - $bDisc;
 
-				$ds = array(
-					'pay_amount' => $pay_amount,
-					'id_sender' => empty($order->id_sender) ? FALSE : $order->id_sender,
-					'id_address' => empty($order->id_address) ? FALSE : $order->id_address
-				);
-			}
-			else
-			{
-				$sc = FALSE;
-				$this->error = "Invalid Order code";
-			}
+        $ds = array(
+          'pay_amount' => $pay_amount,
+          'id_sender' => empty($order->id_sender) ? FALSE : $order->id_sender,
+          'id_address' => empty($order->id_address) ? FALSE : $order->id_address
+        );
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Invalid Order code";
+      }
     }
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Missing required parameter : order code";
-		}
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Missing required parameter : order code";
+    }
 
     echo $sc === TRUE ? json_encode($ds) : $this->error;
   }
-
 
 
   public function get_account_detail($id)
@@ -2724,7 +2688,6 @@ class Orders extends PS_Controller
 
     echo $sc;
   }
-
 
 
   public function confirm_payment()
@@ -2801,12 +2764,11 @@ class Orders extends PS_Controller
   }
 
 
-
   public function do_upload($file, $code)
-	{
+  {
     $this->load->library('upload');
     $sc = TRUE;
-		$image_path = $this->config->item('image_path').'payments/';
+    $image_path = $this->config->item('image_path').'payments/';
     $image 	= new Upload($file);
     if( $image->uploaded )
     {
@@ -2831,8 +2793,8 @@ class Orders extends PS_Controller
 
     $image->clean();	//--- เคลียร์รูปภาพออกจากหน่วยความจำ
 
-		return $sc;
-	}
+    return $sc;
+  }
 
 
   public function view_payment_detail()
@@ -2880,7 +2842,6 @@ class Orders extends PS_Controller
       echo $rs === TRUE ? 'success' : 'fail';
     }
   }
-
 
 
   public function save_address()
@@ -2956,7 +2917,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function get_address_table()
   {
     $sc = TRUE;
@@ -2995,7 +2955,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function set_default_address()
   {
     $this->load->model('address/address_model');
@@ -3028,7 +2987,6 @@ class Orders extends PS_Controller
 
 		echo $sc === TRUE ? 'success' : $this->error;
 	}
-
 
 
 	public function set_sender()
@@ -3083,7 +3041,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function delete_shipping_address()
   {
     $this->load->model('address/address_model');
@@ -3091,7 +3048,6 @@ class Orders extends PS_Controller
     $rs = $this->address_model->delete_shipping_address($id);
     echo $rs === TRUE ? 'success' : 'fail';
   }
-
 
 
   public function set_never_expire()
@@ -3105,61 +3061,61 @@ class Orders extends PS_Controller
 
   public function un_expired()
   {
-		$sc = TRUE;
+    $sc = TRUE;
     $code = $this->input->get('order_code');
-		$order = $this->orders_model->get($code);
+    $order = $this->orders_model->get($code);
 
-		if(!empty($order))
-		{
-			if($order->role == 'U' OR $order->role == 'P')
-			{
-				if($order->role == 'U')
-				{
-					$this->load->model('orders/support_model');
-					$total_amount = $this->orders_model->get_order_total_amount($code);
-					$current = $this->support_model->get_budget($order->customer_code);
-					$used = $this->support_model->get_budget_used($order->customer_code);
+    if(!empty($order))
+    {
+      if($order->role == 'U' OR $order->role == 'P')
+      {
+        if($order->role == 'U')
+        {
+          $this->load->model('orders/support_model');
+          $total_amount = $this->orders_model->get_order_total_amount($code);
+          $current = $this->support_model->get_budget($order->customer_code);
+          $used = $this->support_model->get_budget_used($order->customer_code);
 
-					$balance = $current - $used;
+          $balance = $current - $used;
 
-					if($total_amount > $balance)
-					{
-						$sc = FALSE;
-						$this->error = "งบประมาณไม่เพียงพอ";
-					}
-				}
+          if($total_amount > $balance)
+          {
+            $sc = FALSE;
+            $this->error = "งบประมาณไม่เพียงพอ";
+          }
+        }
 
-				if($order->role == 'P')
-				{
-					$this->load->model('orders/sponsor_model');
-					$total_amount = $this->orders_model->get_order_total_amount($code);
-					$current = $this->sponsor_model->get_budget($order->customer_code);
-					$used = $this->sponsor_model->get_budget_used($order->customer_code);
+        if($order->role == 'P')
+        {
+          $this->load->model('orders/sponsor_model');
+          $total_amount = $this->orders_model->get_order_total_amount($code);
+          $current = $this->sponsor_model->get_budget($order->customer_code);
+          $used = $this->sponsor_model->get_budget_used($order->customer_code);
 
-					$balance = $current - $used;
+          $balance = $current - $used;
 
-					if($total_amount > $balance)
-					{
-						$sc = FALSE;
-						$this->error = "งบประมาณไม่เพียงพอ";
-					}
-				}
-			}
-		}
-		else
-		{
-			$sc = FALSE;
-			$this->error = "Invalid order number";
-		}
+          if($total_amount > $balance)
+          {
+            $sc = FALSE;
+            $this->error = "งบประมาณไม่เพียงพอ";
+          }
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Invalid order number";
+    }
 
-		if($sc === TRUE)
-		{
-			if( ! $this->orders_model->un_expired($code))
-			{
-				$sc = FALSE;
-				$this->error = "ทำรายการไม่สำเร็จ";
-			}
-		}
+    if($sc === TRUE)
+    {
+      if( ! $this->orders_model->un_expired($code))
+      {
+        $sc = FALSE;
+        $this->error = "ทำรายการไม่สำเร็จ";
+      }
+    }
 
     echo $sc === TRUE ? 'success' : $this->error;
   }
@@ -3239,7 +3195,6 @@ class Orders extends PS_Controller
 
     echo $sc === TRUE ? 'success' : $this->error;
   }
-
 
 
   public function order_state_change()
@@ -3945,7 +3900,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function update_gp()
   {
     $code = $this->input->post('code');
@@ -4069,7 +4023,6 @@ class Orders extends PS_Controller
   }
 
 
-
   public function update_price()
   {
     $code = $this->input->post('order_code');
@@ -4135,8 +4088,6 @@ class Orders extends PS_Controller
   }
 
 
-
-
   public function get_summary()
   {
     $this->load->model('masters/bank_model');
@@ -4149,7 +4100,6 @@ class Orders extends PS_Controller
       echo get_summary($order, $details, $bank); //--- order_helper;
     }
   }
-
 
 
   public function get_available_stock($item)
@@ -4686,6 +4636,7 @@ class Orders extends PS_Controller
     echo json_encode($arr);
   }
 
+
   public function clear_filter()
   {
     $filter = array(
@@ -4719,7 +4670,6 @@ class Orders extends PS_Controller
 
     clear_filter($filter);
   }
-
 
 
   public function export_ship_to_address($id)
@@ -4772,6 +4722,30 @@ class Orders extends PS_Controller
   }
 
 
+  public function get_template_file()
+  {
+    $path = $this->config->item('upload_path').'orders/';
+    $file_name = $path."import_order_template.xlsx";
+
+    if(file_exists($file_name))
+    {
+      header('Content-Description: File Transfer');
+      header('Content-Type:Application/octet-stream');
+      header('Cache-Control: no-cache, must-revalidate');
+      header('Expires: 0');
+      header('Content-Disposition: attachment; filename="'.basename($file_name).'"');
+      header('Content-Length: '.filesize($file_name));
+      header('Pragma: public');
+
+      flush();
+      readfile($file_name);
+      die();
+    }
+    else
+    {
+      echo "File Not Found";
+    }
+  }
 
 }
 ?>

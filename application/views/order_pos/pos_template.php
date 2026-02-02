@@ -165,7 +165,7 @@
 	}
 </style>
 <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-keyboard="true">
-	<div class="modal-dialog" style="max-width:300px;">
+	<div class="modal-dialog" style="max-width:500px;">
 		<div class="modal-content">
 			<div class="modal-header" style="border-bottom:solid 1px #f4f4f4;">
 				<h3 class="title text-center" >รับเงิน</h3>
@@ -205,6 +205,28 @@
 						<div class="input-group width-100">
 							<span class="input-group-addon fix-width-100" style="border:solid 1px #d5d5d5 !important; border-right:0 !important; background-color:#f5f5f5 !important;">เช็ค</span>
 							<input type="number" class="form-control input-lg text-center focus p" id="chequeAmount" value="" placeholder="เช็ค">
+						</div>
+					</div>
+
+					<div class="col-lg-12 col-md-12 col-sm-12 margin-bottom-10 c hide" id="p-account">
+						<div class="input-group width-100">
+							<span class="input-group-addon fix-width-100" style="border:solid 1px #d5d5d5 !important; border-right:0 !important; background-color:#f5f5f5 !important;">เข้าบัญชี</span>
+							<?php $account = $this->bank_model->get_active_bank(); ?>
+							<?php if( ! empty($account)) : ?>
+								<?php if(count($account) == 1) : ?>
+									<?php $ac = $account[0]; ?>
+									<select class="form-control input-lg" id="acc-id">
+										<option value="<?php echo $ac->id; ?>" selected><?php echo $ac->acc_name.' #'.$ac->acc_no; ?></option>
+									</select>
+								<?php else : ?>
+									<select class="form-control input-lg focus" id="acc-id" onchange="focusTransfer()">
+										<option value="">เลือกบัญชี</option>
+									<?php foreach($account as $ac) : ?>
+										<option value="<?php echo $ac->id; ?>" <?php echo is_selected($pos->account_id, $ac->id); ?>><?php echo $ac->acc_name.' #'.$ac->acc_no; ?></option>
+									<?php endforeach; ?>
+									</select>
+								<?php endif; ?>
+							<?php endif; ?>
 						</div>
 					</div>
 

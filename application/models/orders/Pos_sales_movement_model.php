@@ -220,5 +220,78 @@ class Pos_sales_movement_model extends CI_Model
 
     return NULL;
   }
+
+
+
+  public function get_export_list(array $ds = array())
+  {
+    $this->db
+    ->select('mv.*')
+    ->select('ac.acc_no')
+    ->select('pos.code AS pos_code, pos.name AS pos_name')
+    ->select('sh.code AS shop_code, sh.name AS shop_name')
+    ->select('r.code AS round_code')
+    ->from('pos_sales_movement AS mv')
+    ->join('bank_account AS ac', 'mv.acc_id = ac.id', 'left')
+    ->join('shop_pos AS pos', 'mv.pos_id = pos.id', 'left')
+    ->join('shop AS sh', 'mv.shop_id = sh.id', 'left')
+    ->join('order_pos_round AS r', 'mv.round_id = r.id', 'left');
+
+    if( ! empty($ds['code']))
+    {
+      $this->db->like('mv.code', $ds['code']);
+    }
+
+    if( ! empty($ds['round_code']))
+    {
+      $this->db->like('r.code', $ds['round_code']);
+    }
+
+    if( ! empty($ds['shop_id']) && $ds['shop_id'] != 'all')
+    {
+      $this->db->where('mv.shop_id', $ds['shop_id']);
+    }
+
+    if( ! empty($ds['pos_id']) && $ds['pos_id'] != 'all')
+    {
+      $this->db->where('mv.pos_id', $ds['pos_id']);
+    }
+
+    if( ! empty($ds['type']) && $ds['type'] != 'all')
+    {
+      $this->db->where('mv.type', $ds['type']);
+    }
+
+    if( ! empty($ds['role']) && $ds['role'] != 'all')
+    {
+      $this->db->where('mv.payment_role', $ds['role']);
+    }
+
+    if( ! empty($ds['bank']) && $ds['bank'] != 'all')
+    {
+      $this->db->where('mv.acc_id', $ds['bank']);
+    }
+
+    if( ! empty($ds['from_date']))
+    {
+      $this->db->where('mv.date_upd >=', from_date($ds['from_date']));
+    }
+
+    if( ! empty($ds['to_date']))
+    {
+      $this->db->where('mv.date_upd <=', to_date($ds['to_date']));
+    }
+
+    $rs = $this->db
+    ->order_by('mv.date_upd', 'DESC')    
+    ->get();
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
 } //--- end class
  ?>

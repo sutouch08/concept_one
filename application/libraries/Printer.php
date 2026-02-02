@@ -7,19 +7,19 @@ public $current_page	= 1;
 public $page_width 	= 200;
 public $page_height	= 282;
 public $content_width	= 190;
-public $row				= 20;
+public $row = 20;
 public $header_rows = 4;
 public $sub_total_row	= 2;
-public $footer_row		= 4;
-public $ex_row			= 0;
-public $total_row		= 16;
-public $row_height 	= 10;
-public $font_size 		= 14;
-public $title				= "";
-public $title_size 		= "h4";
+public $footer_row = 4;
+public $ex_row = 0;
+public $total_row = 16;
+public $row_height = 10;
+public $font_size = 14;
+public $title = "";
+public $title_size = "h4";
 public $content_border = 2;
-public $pattern			= array();
-public $footer			= true;
+public $pattern = array();
+public $footer = true;
 public $custom_header = '';
 
 public $header_row	= array();
@@ -31,9 +31,6 @@ public function __construct()
 {
 	return true;
 }
-
-
-
 
 
 public function config(array $data)
@@ -51,8 +48,6 @@ public function config(array $data)
 	$this->total_page = ceil($this->total_row/$this->row);
 	return true;
 }
-
-
 
 
 public function doc_header($pageTitle = 'print pages')
@@ -90,27 +85,16 @@ public function doc_header($pageTitle = 'print pages')
 }
 
 
-
-
-
 public function add_title($title)
 {
 	$this->title = $title;
 }
 
 
-
-
-
-
 public function set_pattern($pattern) //// กำหนดรูปแบบ CSS ให้กับ td
 {
 	$this->pattern = $pattern;
 }
-
-
-
-
 
 
 public function print_sub_total(array $data)
@@ -130,16 +114,10 @@ public function print_sub_total(array $data)
 }
 
 
-
-
-
 public function add_subheader($sub_header)
 {
 	$this->sub_header = $this->thead($sub_header);
 }
-
-
-
 
 
 public function thead(array $dataset)
@@ -159,16 +137,10 @@ public function thead(array $dataset)
 }
 
 
-
-
-
 public function doc_footer()
 {
 	return "</div></body></html>";
 }
-
-
-
 
 
 public function add_header(array $data)
@@ -185,10 +157,6 @@ public function add_header(array $data)
 	$this->header_rows = ceil($count/2);
 	return true;
 }
-
-
-
-
 
 
 public function print_header()
@@ -221,13 +189,10 @@ public function print_header()
 }
 
 
-
 public function add_custom_header($html)
 {
 	$this->custom_header = $html;
 }
-
-
 
 
 public function print_custom_header()
@@ -240,11 +205,6 @@ public function print_custom_header()
 }
 
 
-
-
-
-
-
 public function add_content($data)
 {
 	$content = "<div style='width:".$this->content_width."mm; margin:auto; margin-bottom:2mm; border:solid 2px #ccc; border-radius: 10px;' >";
@@ -252,11 +212,6 @@ public function add_content($data)
 	$content .="</div>";
 	return $content;
 }
-
-
-
-
-
 
 
 public function page_start()
@@ -270,18 +225,10 @@ public function page_start()
 }
 
 
-
-
-
-
 public function page_end()
 {
 	return "</div><div class='hidden-print' style='height: 5mm; width:".$this->page_width."'></div>";
 }
-
-
-
-
 
 
 public function top_page()
@@ -300,10 +247,6 @@ public function top_page()
 }
 
 
-
-
-
-
 public function content_start()
 {
 	$height = ($this->row + $this->sub_total_row+1) * $this->row_height+2;
@@ -312,18 +255,10 @@ public function content_start()
 }
 
 
-
-
-
-
-
 public function content_end()
 {
 	return "</div>";
 }
-
-
-
 
 
 public function print_row($data)
@@ -348,25 +283,16 @@ public function print_row($data)
 }
 
 
-
-
 public function table_start()
 {
 	return $this->sub_header;
 }
 
 
-
-
-
 public function table_end()
 {
 	return "</table>";
 }
-
-
-
-
 
 
 public function set_footer(array $data)
@@ -400,17 +326,11 @@ public function set_footer(array $data)
 }
 
 
-
-
-
 public function print_barcode($barcode, $css = "")
 {
 	if($css == ""){ $css = "width: 100px;"; }
 	return "<img src='".base_url()."assets/barcode/barcode.php?text=".$barcode."' style='".$css."' />";
 }
-
-
-
 
 
 }//// end class

@@ -6,6 +6,7 @@
 *.pdf
 *.xls
 *.xlsx
+*.csv
 .htaccess
 index.php
 /application/config/config.php

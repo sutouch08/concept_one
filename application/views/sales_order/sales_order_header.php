@@ -108,15 +108,7 @@
               <label>ประเภทงาน</label>
               <select class="form-control input-sm h" id="job-type" >
                 <option value="">เลือก</option>
-                <option value="A" <?php echo is_selected('A', $doc->job_type); ?>>งานปัก</option>
-                <option value="B" <?php echo is_selected('B', $doc->job_type); ?>>งานรีด</option>
-                <option value="C" <?php echo is_selected('C', $doc->job_type); ?>>งานสกรีน</option>
-                <option value="D" <?php echo is_selected('D', $doc->job_type); ?>>งานปัก + รีด</option>
-                <option value="E" <?php echo is_selected('E', $doc->job_type); ?>>งานปัก + สกรีน</option>
-                <option value="F" <?php echo is_selected('F', $doc->job_type); ?>>งานรีด + สกรีน</option>
-                <option value="G" <?php echo is_selected('G', $doc->job_type); ?>>งานปักผสมรีด</option>
-                <option value="H" <?php echo is_selected('H', $doc->job_type); ?>>งานGTX</option>
-                <option value="I" <?php echo is_selected('I', $doc->job_type); ?>>งานสั่งผลิด</option>
+                <?php echo select_job_type($doc->job_type); ?>                
               </select>
             </div>
 

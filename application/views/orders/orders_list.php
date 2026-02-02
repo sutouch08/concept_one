@@ -1,4 +1,5 @@
 <?php $this->load->view('include/header'); ?>
+<?php $allow_upload = is_true(getConfig('ALLOW_UPLOAD_ORDER')); ?>
 <div class="row">
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-5">
     <h4 class="title">
@@ -7,8 +8,14 @@
     </div>
     <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-5">
     	<p class="pull-right top-p">
+				<?php if($allow_upload) : ?>
+					<?php if($this->pm->can_add) : ?>
+						<button type="button" class="btn btn-white btn-primary top-btn btn-100" onclick="getUploadFile()"><i class="fa fa-upload"></i> &nbsp; Import Order</button>
+					<?php endif; ?>
+					<button type="button" class="btn btn-white btn-purple top-btn btn-100" onclick="getTemplate()"><i class="fa fa-download"></i> &nbsp; Template</button>
+				<?php endif;?>
       <?php if($this->pm->can_add) : ?>
-        <button type="button" class="btn btn-xs btn-success" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
+				<button type="button" class="btn btn-white btn-success top-btn btn-100" onclick="addNew()"><i class="fa fa-plus"></i> เพิมใหม่</button>
       <?php endif; ?>
       </p>
     </div>
@@ -132,14 +139,14 @@
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive" id="bill-div">
-		<table class="table tableFixHead border-1" style="font-size:12px; min-width:1470px; border-collapse:inherit;">
+		<table class="table tableFixHead border-1" style="font-size:12px; min-width:1520px; border-collapse:inherit;">
 			<thead>
-				<tr>
+				<tr class="font-size-11">
 					<th class="fix-width-40 middle text-center fix-header">#</th>
 					<th class="fix-width-100 middle text-center fix-header">วันที่</th>
 					<th class="fix-width-100 middle fix-header">เลขที่เอกสาร</th>
 					<th class="fix-width-80 middle text-center fix-header">เล่มเอกสาร</th>
-					<th class="fix-width-100 middle fix-header">เลขที่อ้างอิง</th>
+					<th class="fix-width-150 middle fix-header">เลขที่อ้างอิง</th>
 					<th class="fix-width-100 middle fix-header">รหัสลูกค้า</th>
 					<th class="fix-width-250 middle fix-header">ลูกค้า</th>
 					<th class="fix-width-150 middle fix-header">ผู้ติดต่อ</th>
@@ -156,7 +163,7 @@
           <?php $no = $this->uri->segment(4) + 1; ?>
           <?php foreach($orders as $rs) : ?>
 						<?php $ref = empty($rs->reference) ? '' :' ['.$rs->reference.']'; ?>
-            <tr id="row-<?php echo $rs->code; ?>" style="<?php echo state_color($rs->state, $rs->status, $rs->is_expired); ?>">
+            <tr class="font-size-11" id="row-<?php echo $rs->code; ?>" style="<?php echo state_color($rs->state, $rs->status, $rs->is_expired); ?>">
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $no; ?></td>
               <td class="middle text-center pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo thai_date($rs->date_add); ?></td>
               <td class="middle pointer" onclick="editOrder('<?php echo $rs->code; ?>')"><?php echo $rs->code; ?></td>
@@ -179,7 +186,11 @@
 		</table>
 	</div>
 </div>
-
+<?php
+if($allow_upload) :
+	 $this->load->view('orders/import_order');
+endif;
+?>
 <script>
 	$('#user').select2();
 	$('#sale_code').select2();

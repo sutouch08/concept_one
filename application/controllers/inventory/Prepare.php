@@ -15,6 +15,8 @@ class Prepare extends PS_Controller
     $this->load->model('inventory/prepare_model');
     $this->load->model('orders/orders_model');
     $this->load->model('orders/order_state_model');
+    $this->load->helper('warehouse');
+    $this->load->helper('zone');
   }
 
 
@@ -22,7 +24,7 @@ class Prepare extends PS_Controller
   {
     $this->load->helper('channels');
     $this->load->helper('payment_method');
-    $this->load->helper('warehouse');
+
     $filter = array(
       'code' => get_filter('code', 'ic_code', ''),
       'so_code' => get_filter('so_code', 'so_code', ''),
@@ -35,14 +37,14 @@ class Prepare extends PS_Controller
       'warehouse' => get_filter('warehouse', 'ic_warehouse', 'all')
     );
 
-		//--- แสดงผลกี่รายการต่อหน้า
-		$perpage = get_rows();
+    //--- แสดงผลกี่รายการต่อหน้า
+    $perpage = get_rows();
 
-		$segment  = 4; //-- url segment
-		$rows     = $this->prepare_model->count_rows($filter, 3);
-		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
-		$init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
-		$orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 3);
+    $segment  = 4; //-- url segment
+    $rows     = $this->prepare_model->count_rows($filter, 3);
+    //--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
+    $init	    = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
+    $orders   = $this->prepare_model->get_data($filter, $perpage, $this->uri->segment($segment), 3);
 
     if( ! empty($orders))
     {
@@ -54,7 +56,7 @@ class Prepare extends PS_Controller
 
     $filter['orders'] = $orders;
 
-		$this->pagination->initialize($init);
+    $this->pagination->initialize($init);
     $this->load->view('inventory/prepare/prepare_list', $filter);
   }
 
@@ -105,7 +107,6 @@ class Prepare extends PS_Controller
   }
 
 
-
   public function process($code)
   {
     $this->load->model('masters/customers_model');
@@ -131,6 +132,7 @@ class Prepare extends PS_Controller
     $order->channels_name = $this->channels_model->get_name($order->channels_code);
 
     $uncomplete = $this->orders_model->get_unvalid_details($code);
+
     if(!empty($uncomplete))
     {
       foreach($uncomplete as $rs)
@@ -143,7 +145,7 @@ class Prepare extends PS_Controller
 
     $complete = $this->orders_model->get_valid_details($code);
 
-    if(!empty($complete))
+    if( ! empty($complete))
     {
       foreach($complete as $rs)
       {
@@ -157,7 +159,7 @@ class Prepare extends PS_Controller
           'is_count' => $rs->is_count
         );
 
-        $rs->from_zone = $this->get_prepared_from_zone($arr);
+        $rs->from_zone = $rs->is_count == 1 ? $this->get_prepared_from_zone($arr) : "ไม่นับสต็อก";
       }
     }
 
@@ -315,6 +317,58 @@ class Prepare extends PS_Controller
   }
 
 
+  public function get_order_code()
+  {
+    $sc = TRUE;
+    $code = NULL;
+    $reference = trim($this->input->post('reference'));
+
+    if( ! empty($reference))
+    {
+      $order = $this->orders_model->get($reference);
+
+      if(empty($order))
+      {
+        $order = $this->orders_model->get_order_by_reference($reference);
+      }
+
+      if(empty($order))
+      {
+        $order = $this->orders_model->get_order_by_tracking($reference);
+      }
+
+      if( ! empty($order))
+      {
+        if( ! $order->state == 3 && $order->state != 4)
+        {
+          $sc = FALSE;
+          set_error('status');
+        }
+        else
+        {
+          $code = $order->code;
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        set_error('notfound');
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      set_error('required');
+    }
+
+    $arr = array(
+      'status' => $sc === TRUE ? 'success' : 'failed',
+      'message' => $sc === TRUE ? 'success' : $this->error,
+      'code' => $code
+    );
+
+    echo json_encode($arr);
+  }
 
 
   public function get_prepared_from_zone(array $ds = array())

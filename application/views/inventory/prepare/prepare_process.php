@@ -19,44 +19,54 @@
 <?php else : ?>
 
   <div class="row">
-    <div class="col-sm-3 padding-5">
+    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5 padding-top-10">
 			<div class="input-group">
 				<span class="input-group-addon">เลขที่</span>
-				<input type="text" class="form-control input-sm"
-				value="<?php echo $order->code; ?><?php echo (empty($order->reference) ? "" : "[".$order->reference."]"); ?>" disabled>
+				<input type="text" class="form-control input-sm" value="<?php echo $order->code; ?>" disabled>
 			</div>
     </div>
-    <div class="col-sm-5 padding-5">
-			<div class="input-group">
-				<span class="input-group-addon">ลูกค้า/ผู้เบิก/ผู้ยืม</span>
-				<input type="text" class="form-control input-sm"
-				value="<?php echo ($order->customer_ref == '' ? $order->customer_name : $order->customer_ref);  ?>" disabled>
-			</div>
-    </div>
-    <div class="col-sm-2 col-2-harf padding-5">
-			<div class="input-group">
-				<span class="input-group-addon">ช่องทาง</span>
-				<input type="text" class="form-control input-sm"
-				value="<?php echo $order->channels_name; ?>" disabled>
-			</div>
-    </div>
-    <div class="col-sm-1 col-1-harf padding-5">
+    <div class="col-lg-1-harf col-md-1-harf col-sm-2 col-xs-6 padding-5 padding-top-10">
 			<div class="input-group">
 				<span class="input-group-addon">วันที่</span>
 				<input type="text" class="form-control input-sm text-center"
 				value="<?php echo thai_date($order->date_add); ?>" disabled>
 			</div>
     </div>
-  <?php if($order->remark != '') : ?>
-    <div class="col-sm-12 padding-5 margin-top-10">
+    <div class="col-lg-2-harf col-md-2-harf col-sm-3 col-xs-6 padding-5 padding-top-10">
 			<div class="input-group">
-				<span class="input-group-addon">หมายเหตุ</span>
-				<input type="text" class="form-control input-sm"
-				value="<?php echo $order->remark; ?>" disabled>
+				<span class="input-group-addon">อ้างอิง</span>
+				<input type="text" class="form-control input-sm" value="<?php echo $order->reference; ?>" disabled>
 			</div>
     </div>
-  <?php endif; ?>
+    <div class="col-lg-6 col-md-6-harf col-sm-6-harf col-xs-12 padding-5 padding-top-10">
+			<div class="input-group">
+				<span class="input-group-addon">ลูกค้า/ผู้เบิก/ผู้ยืม</span>
+				<input type="text" class="form-control input-sm"
+				value="<?php echo ($order->customer_ref == '' ? $order->customer_name : $order->customer_ref);  ?>" disabled>
+			</div>
+    </div>
+    <div class="col-lg-3 col-md-3-harf col-sm-4 col-xs-6 padding-5 padding-top-10">
+			<div class="input-group">
+				<span class="input-group-addon">ช่องทาง</span>
+				<input type="text" class="form-control input-sm"
+				value="<?php echo $order->channels_name; ?>" disabled>
+			</div>
+    </div>
 
+    <div class="col-lg-3 col-md-3 col-sm-4 col-xs-6 padding-5 padding-top-10">
+      <div class="input-group">
+				<span class="input-group-addon">คลัง</span>
+				<input type="text" class="form-control input-sm"
+				value="<?php echo $order->warehouse_code.' | '.warehouse_name($order->warehouse_code); ?>" disabled>
+			</div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 padding-5 padding-top-10">
+      <div class="input-group">
+        <span class="input-group-addon">หมายเหตุ</span>
+        <input type="text" class="form-control input-sm"
+        value="<?php echo $order->remark; ?>" disabled>
+      </div>
+    </div>
     <input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
   </div>
 

@@ -5,9 +5,6 @@ function goBack(){
     window.location.href = HOME;
 }
 
-
-
-
 //---- ไปหน้าจัดสินค้า
 function goPrepare(code){
     window.location.href = HOME + '/process/'+code;
@@ -17,6 +14,52 @@ function goPrepare(code){
 function goProcess(){
   window.location.href = HOME + '/view_process';
 }
+
+
+function goToProcess() {
+  let code = $('#order-code').val().trim();
+
+  if(code.length) {
+    load_in();
+    $.ajax({
+      url:HOME + '/get_order_code',
+      type:'POST',
+      cache:false,
+      data:{
+        'reference' : code
+      },
+      success:function(rs) {
+        load_out();
+        if(isJson(rs)) {
+          let ds = JSON.parse(rs);
+
+          if(ds.status === 'success') {
+            goPrepare(ds.code);
+          }
+          else {
+            beep();
+            showError(ds.message);
+          }
+        }
+        else {
+          beep();
+          showError(rs);
+        }
+      },
+      error:function(rs) {
+        beep();
+        showError(rs);
+      }
+    })
+  }
+}
+
+
+$('#order-code').keyup(function(e) {
+  if(e.keyCode === 13) {
+    goToProcess();
+  }
+})
 
 
 function viewHistory(code) {
@@ -62,20 +105,7 @@ function pullBack(code){
 }
 
 
-
-
 //--- ไปหน้ารายการที่กำลังจัดสินค้าอยู่
 function viewProcess(){
   window.location.href = HOME + '/view_process';
 }
-
-
-// $('#item-code').autocomplete({
-//   source : BASE_URL + 'auto_complete/get_prepare_item_code',
-//   autoFocus: true,
-//   close:function(){
-//     let code = $(this).val();
-//     let arr = code.split(' | ');
-//     $(this).val(arr[1]);
-//   }
-// })

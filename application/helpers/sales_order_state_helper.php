@@ -16,7 +16,7 @@ function get_state_name($state)
     '9' => 'ยกเลิก'
   );
 
-  return $name[$state];
+  return empty($name[$state]) ? 'Unknow' : $name[$state];
 }
 
 
@@ -43,7 +43,7 @@ function state_color($state, $status = 'O')
       '9' => 'color:#000; background-color:#C9F4AA;'
     );
 
-    return $color[$state];
+    return empty($color[$state]) ? $color[1] : $color[$state];
   }
 }
 

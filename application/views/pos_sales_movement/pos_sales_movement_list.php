@@ -9,11 +9,11 @@
 <div class="row" id="search-row">
 	<div class="col-lg-2 col-md-1-harf col-sm-2 col-xs-6 padding-5">
 		<label>เลขที่เอกสาร</label>
-		<input type="text" class="form-control input-sm search" name="code"  value="<?php echo $code; ?>" />
+		<input type="text" class="form-control input-sm search" name="code" id="code" value="<?php echo $code; ?>" />
 	</div>
 	<div class="col-lg-2 col-md-1-harf col-sm-2 col-xs-6 padding-5">
 		<label>รอบการขาย</label>
-		<input type="text" class="form-control input-sm search" name="round_code"  value="<?php echo $round_code; ?>" />
+		<input type="text" class="form-control input-sm search" name="round_code" id="round_code"  value="<?php echo $round_code; ?>" />
 	</div>
 	<div class="col-lg-2 col-md-1-harf col-sm-2 col-xs-6 padding-5">
 		<label>จุดขาย</label>
@@ -24,7 +24,7 @@
 	</div>
 	<div class="col-lg-2 col-md-1-harf col-sm-2 col-xs-6 padding-5">
 		<label>เครื่อง POS</label>
-		<select class="form-control input-sm filter" name="pos_id" >
+		<select class="form-control input-sm filter" name="pos_id" id="pos_id">
 			<option value="all">ทั้งหมด</option>
 			<?php echo select_pos_id($pos_id); ?>
 		</select>
@@ -32,7 +32,7 @@
 
 	<div class="col-lg-2 col-md-1 col-sm-2 col-xs-6 padding-5">
 		<label>ประเภท</label>
-		<select class="form-control input-sm filter" name="type">
+		<select class="form-control input-sm filter" name="type" id="type">
 			<option value="all">ทั้งหมด</option>
 			<option value="S" <?php echo is_selected('S', $type); ?>>ขาย</option>
 			<option value="C" <?php echo is_selected('C', $type); ?>>ยกเลิก</option>
@@ -49,7 +49,7 @@
 
 	<div class="col-lg-2 col-md-1 col-sm-2 col-xs-6 padding-5">
 		<label>ช่องทาง</label>
-		<select class="form-control input-sm filter" name="role">
+		<select class="form-control input-sm filter" name="role" id="role">
 			<option value="all">ทั้งหมด</option>
 			<option value="1" <?php echo is_selected('1', $role); ?>>เงินสด</option>
 			<option value="2" <?php echo is_selected('2', $role); ?>>เงินโอน</option>
@@ -60,7 +60,7 @@
 
 	<div class="col-lg-2 col-md-1 col-sm-2 col-xs-6 padding-5">
 		<label>บัญชี</label>
-		<select class="form-control input-sm filter" name="bank">
+		<select class="form-control input-sm filter" name="bank" id="bank">
 			<option value="all">ทั้งหมด</option>
 			<?php echo select_bank_account($bank); ?>
 		</select>
@@ -82,6 +82,11 @@
 	<div class="col-lg-1 col-md-1-harf col-sm-1-harf padding-5">
 		<label class="display-block not-show">btn</label>
 		<button type="button" class="btn btn-xs btn-warning btn-block" onclick="clearFilter()">Reset</button>
+	</div>
+
+	<div class="col-lg-1 col-md-1-harf col-sm-1-harf padding-5">
+		<label class="display-block not-show">btn</label>
+		<button type="button" class="btn btn-xs btn-success btn-block" onclick="exportFilter()">Export</button>
 	</div>
 </div>
 <input type="hidden" name="search" value="1" />
@@ -131,5 +136,9 @@
 	</div>
 </div>
 
+<form id="exportForm" action="<?php echo current_url(); ?>/export_filter" method="post">
+	<input type="hidden" name="token" id="token" />
+	<input type="hidden" name="data" id="data" />
+</form>
 <script src="<?php echo base_url(); ?>scripts/pos_sales_movement/pos_sales_movement.js?v=<?php echo date('Ymd'); ?>"></script>
 <?php $this->load->view('include/footer'); ?>

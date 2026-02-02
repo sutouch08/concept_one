@@ -84,7 +84,7 @@
 
 		<div class="divider"></div>
 
-		<div class="col-lg-1-harf col-md-2 col-sm-2 col-xs-6 padding-5">
+		<div class="col-lg-2 col-md-2-harf col-sm-2 col-xs-6 padding-5">
 			<label>อ้างอิง</label>
 			<input type="text" class="form-control input-sm text-center h" name="reference" id="reference" value="<?php echo $order->reference; ?>" <?php echo $disabled; ?> />
 		</div>

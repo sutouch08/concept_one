@@ -35,4 +35,63 @@ function sale_order_log_label($action = NULL)
   return empty($arr[$action]) ? 'unknow' : $arr[$action];
 }
 
+
+function select_job_type($code = NULL)
+{
+  $ds = "";
+  $ci =& get_instance();
+  $qs = $ci->db->get('job_type');
+
+  if($qs->num_rows() > 0)
+  {
+    foreach($qs->result() as $rs)
+    {
+      $ds .= '<option value="'.$rs->code.'" '.is_selected($rs->code, $code).'>'.$rs->name.'</option>';
+    }
+  }
+
+  return $ds;
+}
+
+
+function job_name($code)
+{
+  $ci =& get_instance();
+  $qs = $ci->db->select('name')->where('code', $code)->get('job_type');
+
+  if($qs->num_rows() === 1)
+  {
+    return $qs->row()->name;
+  }
+
+  return NULL;
+}
+
+
+function select_so_state($state = NULL)
+{
+  $states = [
+    '1' => 'รอดำเนินการ',
+    '2' => 'รอชำระเงิน',
+    '3' => 'รอแบบ',
+    '31' => 'ออกแบบเสร็จ',
+    '32' => 'รอปริ้นเฟล็ก',
+    '33' => 'ปริ้นเฟล็กเสร็จ',
+    '4' => 'รอผลิต',
+    '5' => 'กำลังผลิต',
+    '6' => 'ผลิตเสร็จ',
+    '7' => 'รอจัดส่ง',
+    '8' => 'จัดส่งแล้ว'
+  ];
+
+  $ds = "";
+
+  foreach($states as $st => $name)
+  {
+    $ds .= '<option value="'.$st.'" '.is_selected(strval($st), strval($state)).'>'.$name.'</option>';
+  }
+
+  return $ds;
+}
+
  ?>

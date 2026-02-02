@@ -1,49 +1,45 @@
 <div class="modal fade" id="upload-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
- <div class="modal-dialog" style="max-width:400px;">
-   <div class="modal-content">
-       <div class="modal-header">
-       <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-       <h4 class="modal-title">นำเข้าไฟล์ Excel</h4>
-      </div>
-      <div class="modal-body">
-        <form id="upload-form" name="upload-form" method="post" enctype="multipart/form-data">
-        <div class="row margin-left-0 margin-right-0">
-          <div class="col-lg-9 col-md-9 col-sm-9 col-xs-8 padding-5">
-            <button type="button" class="btn btn-sm btn-primary btn-block" id="show-file-name" onclick="getFile()">กรุณาเลือกไฟล์ Excel</button>
-          </div>
-
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-4 padding-5">
-            <button type="button" class="btn btn-sm btn-info btn-block" onclick="uploadfile()"><i class="fa fa-cloud-upload"></i> นำเข้า</button>
-          </div>
-        </div>
-        <input type="file" class="hide" name="uploadFile" id="uploadFile" accept=".xlsx" />
-        <input type="hidden" name="555" />
-        </form>
-       </div>
-      <div class="modal-footer">
-
-      </div>
-   </div>
+ <div class="modal-dialog" style="width:600px; max-width:95vw;">
+	 <div class="modal-content">
+			 <div class="modal-header">
+			 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+			 <h4 class="modal-title">Import File</h4>
+			</div>
+			<div class="modal-body">
+				<form id="upload-form" name="upload-form" method="post" enctype="multipart/form-data">
+				<div class="row">
+					<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="input-group width-100">
+              <input type="text" class="form-control" id="show-file-name" placeholder="กรุณาเลือกไฟล์ Excel" readonly />
+              <span class="input-group-btn">
+                <button type="button" class="btn btn-white btn-default"  onclick="getFile()">เลือกไฟล์</button>
+              </span>
+            </div>
+					</div>
+				</div>
+				<input type="file" class="hide" name="uploadFile" id="uploadFile" accept=".xlsx" />
+				</form>
+			 </div>
+			<div class="modal-footer">
+        <button type="button" class="btn btn-sm btn-default btn-100" onclick="closeModal('upload-modal')">ยกเลิก</button>
+        <button type="button" class="btn btn-sm btn-primary btn-100" onclick="uploadfile()">นำเข้า</button>
+			</div>
+	 </div>
  </div>
 </div>
 
 <script>
 
 function getUploadFile(){
+  $('#uploadFile').val('');
+  $('#show-file-name').val('').clearError();
   $('#upload-modal').modal('show');
 }
-
 
 
 function getFile(){
   $('#uploadFile').click();
 }
-
-
-
-
-
-
 
 
 $("#uploadFile").change(function(){
@@ -61,53 +57,71 @@ $("#uploadFile").change(function(){
 			return false;
 		}
 		//readURL(this);
-    $('#show-file-name').text(name);
+    $('#show-file-name').val(name);
 	}
 });
 
 
+function uploadfile()	{
+  $('#show-file-name').clearError();
 
-	function uploadfile()
-	{
+  if($('#uploadFile').val() != '' )
+  {
     $('#upload-modal').modal('hide');
 
-		var file	= $("#uploadFile")[0].files[0];
-		var fd = new FormData();
-		fd.append('uploadFile', $('input[type=file]')[0].files[0]);
-		if( file !== '')
-		{
-			load_in();
-			$.ajax({
-				url:BASE_URL + 'orders/import_order', //"controller/importController.php?importOrderFromWeb",
-				type:"POST",
-        cache:"false",
+    var file	= $("#uploadFile")[0].files[0];
+    var fd = new FormData();
+
+    if( file !== '')
+    {
+      fd.append('uploadFile', $('input[type=file]')[0].files[0]);
+
+      load_in();
+
+      $.ajax({
+        url:BASE_URL + 'orders/import_order',
+        type:"POST",
+        cache:false,
         data: fd,
         processData:false,
         contentType: false,
-				success: function(rs){
-					load_out();
-					var rs = $.trim(rs);
-          if(rs === 'success'){
-            swal({
-              title: 'นำเข้าเรียบร้อยแล้ว',
-              text : rs,
-              type: 'success',
-              html:true,
-              timer:1000
-            });
+        success: function(rs) {
+          load_out();
 
-            setTimeout(function(){
-              window.location.reload();
-            }, 1200);
-          }else{
-            swal({
-              title:'Error!!',
-              text:rs,
-              type:'error'
-            });
+          if(isJson(rs)) {
+
+            let ds = JSON.parse(rs);
+
+            if(ds.status == 'success') {
+              swal({
+                title:'นำเข้าเรียบร้อยแล้ว',
+                text:ds.message,
+                type:'success',
+                html:true
+              }, function() {
+                goBack();
+              });
+            }
+            else {
+              showError(ds.message);
+            }
           }
-				}
-			});
-		}
-	}
+          else {
+            showError(rs);
+          }
+        },
+        error:function(rs) {
+          load_out();
+          showError(rs);
+        }
+      });
+    }
+  }
+  else
+  {
+    $('#show-file-name').hasError();
+  }
+
+}
+
 </script>

@@ -52,3 +52,30 @@ $('#toDate').datepicker({
     $('#tromDate').datepicker('option', 'maxDate', sd)
   }
 });
+
+
+function exportFilter() {
+	let token = generateUID();
+	let h = {
+		'code' : $('#code').val().trim(),
+		'round_code' : $('#round_code').val().trim(),
+		'shop_id' : $('#shop_id').val(),
+		'pos_id' : $('#pos_id').val(),
+		'type' : $('#type').val(),
+		'role' : $('#role').val(),
+		'bank' : $('#bank').val(),
+		'from_date' : $('#fromDate').val(),
+		'to_date' : $('#toDate').val()
+	}
+
+	if(h.from_date == "" || h.to_date == "") {
+		swal("กรุณาระบุวันที่");
+		return false;
+	}
+
+	$('#data').val(JSON.stringify(h));
+	$('#token').val(token);
+
+	get_download(token);
+	$('#exportForm').submit();
+}

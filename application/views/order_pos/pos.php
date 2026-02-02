@@ -14,7 +14,7 @@
 			<tr><td>ลูกค้า</td><td><?php echo $pos->customer_name; ?></td></tr>
 			<tr><td>เจ้าหน้าที่</td><td><?php echo $this->_user->name; ?></td></tr>
 		</table>
-  </div>
+  </div>	
 	<!-- <div class="col-lg-2-harf col-md-2-harf col-sm-2-harf padding-5">
 		<div class="input-group width-100">
 			<span class="input-group-addon fix-width-60" style="border:solid 1px #d5d5d5 !important; border-right:0 !important;">PC</span>

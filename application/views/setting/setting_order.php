@@ -124,7 +124,7 @@
 			<span class="help-block">กรณีปิดจะไม่สามารแก้ไขราคาขายสินค้าในออเดอร์ได้ จะใช้ราคาขายในระบบเท่านั้น</span>
 			<input type="hidden" name="ORDER_OVER_STOCK" id="order-over-stock" value="<?php echo $ORDER_OVER_STOCK; ?>" />
 		</div>
-		<div class="divider-hidden"></div>		
+		<div class="divider-hidden"></div>
 
 		<div class="col-sm-3"><span class="form-control left-label">Default Transfer Payment</span></div>
 		<div class="col-sm-9">
@@ -145,71 +145,69 @@
 		</div>
 		<div class="divider-hidden"></div>
 
-		<!--
-		<div class="col-sm-3"><span class="form-control left-label">ช่องทางขายเว็บไซต์</span></div>
+		<!-- <div class="col-sm-3"><span class="form-control left-label">ช่องทางขายเว็บไซต์</span></div>
 		<div class="col-sm-9">
-		<select class="form-control input-sm input-medium" name="WEB_SITE_CHANNELS_CODE" id="web-site-channels-code" >
-		<?php echo select_channels($WEB_SITE_CHANNELS_CODE); ?>
-	</select>
-	<span class="help-block">เลือกรหัสสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
-</div>
-<div class="divider-hidden"></div>
+			<select class="form-control input-sm input-medium" name="WEB_SITE_CHANNELS_CODE" id="web-site-channels-code" >
+				<?php echo select_channels($WEB_SITE_CHANNELS_CODE); ?>
+			</select>
+			<span class="help-block">เลือกรหัสสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
 
-<div class="col-sm-3"><span class="form-control left-label">คลังเว็บไซต์</span></div>
-<div class="col-sm-9">
-	<select class="form-control input-sm input-medium" name="WEB_SITE_WAREHOUSE_CODE" >
-		<option value="">ทั้งหมด</option>
-		<?php echo select_sell_warehouse($WEB_SITE_WAREHOUSE_CODE); ?>
-	</select>
-	<span class="help-block">เลือกคลังสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
-</div>
-<div class="divider-hidden"></div>
+		<div class="col-sm-3"><span class="form-control left-label">คลังเว็บไซต์</span></div>
+		<div class="col-sm-9">
+			<select class="form-control input-sm input-medium" name="WEB_SITE_WAREHOUSE_CODE" >
+				<option value="">ทั้งหมด</option>
+				<?php echo select_sell_warehouse($WEB_SITE_WAREHOUSE_CODE); ?>
+			</select>
+			<span class="help-block">เลือกคลังสำหรับการขายบนเว็บไซต์(ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
 
-<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ COD</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_COD" required value="<?php echo $CUSTOMER_CODE_COD; ?>" />
-	<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ COD บนเว็บไซต์ (ใช้ในการ import order)</span>
-</div>
-<div class="divider-hidden"></div>
+		<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ COD</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_COD" required value="<?php echo $CUSTOMER_CODE_COD; ?>" />
+			<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ COD บนเว็บไซต์ (ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
 
-<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ 2C2P</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_2C2P" required value="<?php echo $CUSTOMER_CODE_2C2P; ?>" />
-	<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ 2C2P บนเว็บไซต์ (ใช้ในการ import order)</span>
-</div>
-<div class="divider-hidden"></div>
+		<div class="col-sm-3"><span class="form-control left-label">รหัสลูกค้าเว็บไซต์ 2C2P</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="CUSTOMER_CODE_2C2P" required value="<?php echo $CUSTOMER_CODE_2C2P; ?>" />
+			<span class="help-block">กำหนดรหัสลูกค้า สำหรับช่องทางการชำระเงินแบบ 2C2P บนเว็บไซต์ (ใช้ในการ import order)</span>
+		</div>
+		<div class="divider-hidden"></div>
 
-<div class="col-sm-3"><span class="form-control left-label">รหัสนำหน้าเลขที่จัดส่ง</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-small text-center" name="PREFIX_SHIPPING_NUMBER" value="<?php echo $PREFIX_SHIPPING_NUMBER; ?>" />
-	<span class="help-block">รหัสนำหน้าเลขที่จัดส่ง โดยใช้เลขที่ออเดอร์ของ Warrix12 แล้วเติมรหัสนี้นำหน้าและบันทึกเป็นเลขที่จัดส่งทันที ใช้ในการ import ออเดอร์จากเว็บไซต์</span>
-</div>
+		<div class="col-sm-3"><span class="form-control left-label">รหัสนำหน้าเลขที่จัดส่ง</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="PREFIX_SHIPPING_NUMBER" value="<?php echo $PREFIX_SHIPPING_NUMBER; ?>" />
+			<span class="help-block">รหัสนำหน้าเลขที่จัดส่ง โดยใช้เลขที่ออเดอร์ของ Warrix12 แล้วเติมรหัสนี้นำหน้าและบันทึกเป็นเลขที่จัดส่งทันที ใช้ในการ import ออเดอร์จากเว็บไซต์</span>
+		</div>
 
+		<div class="col-sm-3"><span class="form-control left-label">น้ำหนักเหมารวม(กรัม)</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="DHL_DEFAULT_WEIGHT" value="<?php echo $DHL_DEFAULT_WEIGHT; ?>" />
+			<span class="help-block">น้ำหนักเหมารวมในการจัดส่ง 1 แพ็คเกจ(กรัม)</span>
+		</div> 	 -->
 
-<div class="col-sm-3"><span class="form-control left-label">รหัสรายได้ค่าจัดส่ง</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-large text-center" name="SHIPPING_ITEM_CODE" value="<?php echo $SHIPPING_ITEM_CODE; ?>" />
-	<span class="help-block">รหัสสินค้ารายได้ค่าจัดส่ง ที่จะเพิ่มเป็นรายการสินค้าให้ในออเดอร์ที่มีการคิดค่าจัดส่ง</span>
-</div>
+		<div class="col-sm-3"><span class="form-control left-label">รหัสรายได้ค่าจัดส่ง</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-large text-center" name="SHIPPING_ITEM_CODE" value="<?php echo $SHIPPING_ITEM_CODE; ?>" />
+			<span class="help-block">รหัสสินค้ารายได้ค่าจัดส่ง ที่จะเพิ่มเป็นรายการสินค้าให้ในออเดอร์ที่มีการคิดค่าจัดส่ง</span>
+		</div>
 
-<div class="col-sm-3"><span class="form-control left-label">น้ำหนักเหมารวม(กรัม)</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-small text-center" name="DHL_DEFAULT_WEIGHT" value="<?php echo $DHL_DEFAULT_WEIGHT; ?>" />
-	<span class="help-block">น้ำหนักเหมารวมในการจัดส่ง 1 แพ็คเกจ(กรัม)</span>
-</div>
+		<div class="col-sm-3"><span class="form-control left-label">อัพโหลดออเดอร์(รายการ)/ครั้ง</span></div>
+		<div class="col-sm-9">
+			<input type="text" class="form-control input-sm input-small text-center" name="IMPORT_ROWS_LIMIT" value="<?php echo $IMPORT_ROWS_LIMIT; ?>" />
+			<span class="help-block">จำกัดจำนวนรายการที่ออเดอร์ที่สามารถนำเข้าระบบได้ครั้งละไม่เกินรายการที่กำหนด เพื่อไม่ให้ระบบเกิดข้อผิดพลาด</span>
+		</div>
 
-<div class="col-sm-3"><span class="form-control left-label">อัพโหลดออเดอร์(รายการ)/ครั้ง</span></div>
-<div class="col-sm-9">
-	<input type="text" class="form-control input-sm input-small text-center" name="IMPORT_ROWS_LIMIT" value="<?php echo $IMPORT_ROWS_LIMIT; ?>" />
-	<span class="help-block">จำกัดจำนวนรายการที่ออเดอร์ที่สามารถนำเข้าระบบได้ครั้งละไม่เกินรายการที่กำหนด เพื่อไม่ให้ระบบเกิดข้อผิดพลาด</span>
-</div>
+		<div class="col-sm-9 col-sm-offset-3">
+			<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
+				<button type="button" class="btn btn-sm btn-success" onClick="updateConfig('orderForm')"><i class="fa fa-save"></i> บันทึก</button>
+			<?php endif; ?>
+		</div>
+		<div class="divider-hidden"></div>
+	</div>
 
--->
-<div class="col-sm-9 col-sm-offset-3">
-	<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
-		<button type="button" class="btn btn-sm btn-success" onClick="updateConfig('orderForm')"><i class="fa fa-save"></i> บันทึก</button>
-	<?php endif; ?>
-</div>
-<div class="divider-hidden"></div>
-</div>
 </form>

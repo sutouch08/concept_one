@@ -81,7 +81,7 @@ class Down_payment_invoice_model extends CI_Model
 
 
   //---- ODPI
-  public function get_down_payments_by_array(array $codes = array())
+  public function get_sap_down_payments_by_array(array $codes = array())
   {
     if( ! empty($codes))
     {
@@ -91,6 +91,26 @@ class Down_payment_invoice_model extends CI_Model
       ->where('DocStatus', 'O')
       ->where('CANCELED', 'N')
       ->get('ODPI');
+
+      if($rs->num_rows() > 0)
+      {
+        return $rs->result();
+      }
+    }
+
+    return NULL;
+  }
+
+
+  public function get_down_payments_by_array(array $codes = array())
+  {
+    if( ! empty($codes))
+    {
+      $rs = $this->db
+      ->select('id, code, DocTotal, VatSum')
+      ->where_in('code', $codes)
+      ->where('status !=', 'D')
+      ->get($this->tb);
 
       if($rs->num_rows() > 0)
       {

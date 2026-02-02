@@ -771,7 +771,6 @@ $('.line-price').keydown(function(event){
 });
 
 
-
 function updateItem(id) {
 	let qty = parseDefault(parseFloat(removeCommas($('#qty-'+id).val())), 1.00);
 	let price = parseDefault(parseFloat(removeCommas($('#price-'+id).val())), 0.00);
@@ -782,6 +781,30 @@ function updateItem(id) {
 
 	disc = disc == '' ? 0 : disc;
 	currentDisc = currentDisc == '' ? 0 : currentDisc;
+
+	let disc_price = parseDiscountAmount(disc, price);
+
+	if(price < disc_price) {
+		beep();
+		swal({
+			title:'Error!',
+			text:"ส่วนลดเกินราคาขาย",
+			type:'error'
+		});
+
+		//--- roll back data
+		var c_price = addCommas($('#currentPrice-'+id).val());
+		var c_disc = $('#currentDisc-'+id).val();
+		var c_qty = $('#currentQty-'+id).val();
+
+		$('#price-'+id).val(c_price);
+		$('#disc-'+id).val(c_disc);
+		$('#qty-'+id).val(c_qty);
+
+		recalItem(id);
+
+		return false;
+	}
 
 	$('#price-'+id).val(addCommas(price.toFixed(2)));
 	$('#qty-'+id).val(addCommas(qty.toFixed(2)));
@@ -794,33 +817,33 @@ function updateItem(id) {
 			recalItem(id);
 		}
 
-		setTimeout(() => {
-			$.ajax({
-				url:HOME + 'update_item',
-				type:'POST',
-				cache:false,
-				data:{
-					'id' : id,
-					'price' : price,
-					'qty' : qty,
-					'discount_label' : disc,
-					'is_edit' : 1
-				},
-				success:function(rs) {
-					if(rs == 'success') {
-						//--- update current
-						$('#currentPrice-'+id).val(addCommas(price));
-						$('#currentDisc-'+id).val(disc);
-						$('#currentQty-'+id).val(qty);
-						$('#isEdit-'+id).val(1);
+		$.ajax({
+			url:HOME + 'update_item',
+			type:'POST',
+			cache:false,
+			data:{
+				'id' : id,
+				'price' : price,
+				'qty' : qty,
+				'discount_label' : disc,
+				'is_edit' : 1
+			},
+			success:function(rs) {
+				if(rs == 'success') {
+					//--- update current
+					$('#currentPrice-'+id).val(addCommas(price));
+					$('#currentDisc-'+id).val(disc);
+					$('#currentQty-'+id).val(qty);
+					$('#isEdit-'+id).val(1);
 
-						recalItem(id);
-					}
-					else {
+					recalItem(id);
+				}
+				else {
+					setTimeout(() => {
 						swal({
 							title:'Error!',
 							text:rs,
-							type:'eror'
+							type:'error'
 						});
 
 						//--- roll back data
@@ -833,10 +856,10 @@ function updateItem(id) {
 						$('#qty-'+id).val(c_qty);
 
 						recalItem(id);
-					}
+					}, 100);
 				}
-			})
-		}, 100);
+			}
+		})
 	}
 }
 
@@ -1088,6 +1111,7 @@ function showPayment() {
 
 	if(role == 2) {
 		$('#p-transfer').removeClass('hide');
+		$('#p-account').removeClass('hide');
 		$('#transferAmount').val(payAmount);
 		$('#changeAmount').val('');
 		$('#paymentModal').on('shown.bs.modal', function() {
@@ -1125,6 +1149,7 @@ function showPayment() {
 	$('#paymentModal').modal('show');
 }
 
+
 $('.p').keyup(function(e) {
 	$(this).removeClass('has-error');
 
@@ -1139,6 +1164,7 @@ $('.p').keyup(function(e) {
 		calChange();
 	}
 });
+
 
 $('#cashReceive').keydown(function(e) {
 	if(e.keyCode === 38) {
@@ -1156,6 +1182,7 @@ $('#cashReceive').keydown(function(e) {
 	}
 })
 
+
 $('#transferAmount').keydown(function(e) {
 	if(e.keyCode === 38) {
 		e.preventDefault();
@@ -1172,6 +1199,7 @@ $('#transferAmount').keydown(function(e) {
 		$(this).val('');
 	}
 })
+
 
 $('#cardAmount').keydown(function(e) {
 	if(e.keyCode === 38) {
@@ -1194,6 +1222,11 @@ $('.p').focus(function() {
 	let tmp = $(this).val();
 	$(this).val(tmp);
 })
+
+
+function focusTransfer() {
+	$('#transferAmount').focus();
+}
 
 
 function calChange() {
@@ -1228,6 +1261,7 @@ function submitPayment() {
 	let pos_id = $('#pos_id').val();
 	let temp_id = $('#order-temp-id').val();
 	let role = $('#payment-role').val();
+	let acc_id = $('#acc-id').val();
 	let amountBfDisc = parseDefault(parseFloat($('#total-amount').val()), 0.00);
 	let discPrcnt = parseDefault(parseFloat($('#discPrcnt').val()), 0.00);
 	let discAmount = parseDefault(parseFloat($('#bill-disc-amount').val()), 0.00);
@@ -1263,6 +1297,11 @@ function submitPayment() {
 
 
 	if(role == 6) {
+		if(transferAmount > 0 && acc_id == "") {
+			$('#payment-error').val('กรุณาเลือกบัญชีธนาคาร');
+			return false;
+		}
+
 		if(receive > payAmount) {
 			if(nonCash > payAmount)
 			{
@@ -1282,6 +1321,12 @@ function submitPayment() {
 		}
 		else {
 			cashAmount = cashReceive;
+		}
+	}
+	else if(role == 2) {
+		if(acc_id == "") {
+			$('#payment-error').val('กรุณาเลือกบัญชีธนาคาร');
+			return false;
 		}
 	}
 
@@ -1313,6 +1358,7 @@ function submitPayment() {
 		data: {
 			'pos_id' : pos_id,
 			'temp_id' : temp_id,
+			'acc_id' : acc_id,
 			'amountBfDisc' : amountBfDisc,
 			'discPrcnt' : discPrcnt,
 			'discAmount' : discAmount,

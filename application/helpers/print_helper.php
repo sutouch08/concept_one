@@ -53,10 +53,6 @@ function doc_type($role)
 }
 
 
-
-
-
-
 function get_header($order)
 {
 	$CI =& get_instance();
@@ -65,12 +61,12 @@ function get_header($order)
 	if( $order->role == 'P')
 	{
 		$header	= array(
-				"ผู้รับ" => $order->customer_name,
-				"วันที่" => thai_date($order->date_add, FALSE, '/'),
-				"ผู้เบิก" => $CI->user_model->get_name($order->user),
-				"เลขที่" => $order->code,
-				"ผู้ทำรายการ" =>  $CI->user_model->get_name($order->user)
-			);
+			"ผู้รับ" => $order->customer_name,
+			"วันที่" => thai_date($order->date_add, FALSE, '/'),
+			"ผู้เบิก" => $CI->user_model->get_name($order->user),
+			"เลขที่" => $order->code,
+			"ผู้ทำรายการ" =>  $CI->user_model->get_name($order->user)
+		);
 	}
 
 
@@ -78,12 +74,12 @@ function get_header($order)
 	//---	ยิมสินค้า
 	else if($order->role == 'L' )
 	{
-				$header		= array(
-								"เลขที่"	=> $order->code,
-								"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
-								"ผู้ยืม"	=> $order->customer_name,
-								"ผู้ทำรายการ" => $CI->user_model->get_name($order->user)
-							);
+		$header		= array(
+			"เลขที่"	=> $order->code,
+			"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
+			"ผู้ยืม"	=> $order->customer_name,
+			"ผู้ทำรายการ" => $CI->user_model->get_name($order->user)
+		);
 	}
 
 
@@ -91,53 +87,47 @@ function get_header($order)
 	else if( $order->role == 'R' || $order->role == 'T' )
 	{
 		$header		= array(
-									"ลูกค้า"	=> $order->customer_name,
-									"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
-									"ผู้เบิก"	=> $CI->user_model->get_name($order->user),
-									"เลขที่"	=> $order->code,
-									"ใบสั่งขาย" => $order->so_code
-									);
+			"ลูกค้า"	=> $order->customer_name,
+			"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
+			"ผู้เบิก"	=> $CI->user_model->get_name($order->user),
+			"เลขที่"	=> $order->code,
+			"ใบสั่งขาย" => $order->so_code
+		);
 	}
 
 	//---	เบิกอภินันท์
 	else if( $order->role == 'U')
 	{
 		$header	= array(
-									"ผู้เบิก"	=> $order->customer_name,
-									"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
-									"ผู้ทำรายการ"	=> $CI->user_model->get_name($order->user),
-									"เลขที่"	=> $order->code
-									);
+			"ผู้เบิก"	=> $order->customer_name,
+			"วันที่"	=> thai_date($order->date_add, FALSE, '/'),
+			"ผู้ทำรายการ"	=> $CI->user_model->get_name($order->user),
+			"เลขที่"	=> $order->code
+			);
+		}
+		else if( $order->role == 'C' OR $order->role == 'N')
+		{
+			$header	= array(
+			"ลูกค้า"	 => $order->customer_name,
+			"วันที่"		=> thai_date($order->date_add, FALSE, '/'),
+			"พนักงาน" => $CI->user_model->get_name($order->user),
+			"เลขที่" => $order->code
+			);
+		}
+		else
+		{
+			$ref = !empty($order->reference) ? '['.$order->reference.']' : '';
+			$header	= array(
+			"ลูกค้า"	=> $order->customer_name,
+			"วันที่"		=> thai_date($order->date_add, FALSE, '/'),
+			"พนักงาน" => $CI->user_model->get_name($order->user),
+			"เลขที่" => $order->code.$ref
+			);
+		}
+
+		return $header;
 	}
-	else if( $order->role == 'C' OR $order->role == 'N')
-	{
-		$header	= array(
-							"ลูกค้า"	 => $order->customer_name,
-							"วันที่"		=> thai_date($order->date_add, FALSE, '/'),
-							"พนักงาน" => $CI->user_model->get_name($order->user),
-							"เลขที่" => $order->code
-							);
-	}
-	else
-	{
-		$ref = !empty($order->reference) ? '['.$order->reference.']' : '';
-		$header	= array(
-							"ลูกค้า"	=> $order->customer_name,
-							"วันที่"		=> thai_date($order->date_add, FALSE, '/'),
-							"พนักงาน" => $CI->user_model->get_name($order->user),
-							"เลขที่" => $order->code.$ref
-							);
-	}
 
-	return $header;
-}
-
-
-
-// function barcodeImage($barcode)
-// {
-// 	return '<img src="'.base_url().'assets/barcode/barcode.php?text='.$barcode.'" style="height:8mm;" />';
-// }
 
 function barcodeImage($barcode, $height = 8, $width = NULL, $fontsize = 8, $css = NULL)
 {
@@ -149,9 +139,10 @@ function barcodeImage($barcode, $height = 8, $width = NULL, $fontsize = 8, $css 
 	return '<img src="'.base_url().'assets/barcode/barcode.php?text='.$barcode.'&font_size='.$fontsize.'" style="'.$style.'" />';
 }
 
+
 function inputRow($text, $style='')
 {
-  return '<input type="text" class="print-row" value="'.$text.'" '.(empty($style) ? '' : 'style="'.$style.'" ').' readonly/>';
+  return '<input type="text" class="width-100 text-label" value="'.$text.'" '.(empty($style) ? '' : 'style="'.$style.'" ').' disabled />';
 }
 
 

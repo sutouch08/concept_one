@@ -7,7 +7,8 @@
                 <td class="width-50" style="border:0px; padding:5px;">
                 	<select class="form-control input-sm" style="padding-top:0px; padding-bottom:0px;" id="stateList">
                     	<option value="0">เลือกสเตท</option>
-											<option value="1">รอดำเนินการ</option>
+											<?php echo select_so_state(); ?>
+											<!-- <option value="1">รอดำเนินการ</option>
 											<option value="2">รอชำระเงิน</option>
 											<option value="3">รอแบบ</option>
 											<option value="31">ออกแบบเสร็จ</option>
@@ -17,11 +18,11 @@
                       <option value="5">กำลังผลิต</option>
                       <option value="6">ผลิตเสร็จ</option>
                       <option value="7">รอจัดส่ง</option>
-											<option value="8">จัดส่งแล้ว</option>
+											<option value="8">จัดส่งแล้ว</option> -->
                     </select>
                 </td>
                 <td class="width-25" style="border:0px; padding:5px;">
-									<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสเตท</button>                
+									<button class="btn btn-xs btn-primary btn-block" onclick="changeState()">เปลี่ยนสเตท</button>
                 </td>
             </tr>
        <?php else : ?>

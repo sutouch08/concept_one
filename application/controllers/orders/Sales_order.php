@@ -851,18 +851,6 @@ class Sales_order extends PS_Controller
 
       $this->load->library('xprinter');
       $this->load->helper('print');
-      $job = [
-        'A' => 'งาน ปัก',
-        'B' => 'งาน รีด',
-        'C' => 'งาน สกรีน',
-        'D' => 'งาน ปัก + รีด',
-        'E' => 'งาน ปัก + สกรีน',
-        'F' => 'งาน รีด + สกรีน',
-        'G' => 'งาน ปักผสมรีด',
-        'H' => 'งาน GTX',
-        'I' => 'งานสั่งผลิด'
-      ];
-
       $wqText = "";
       $wqList = $this->sales_order_model->get_transform_list($doc->code);
 
@@ -877,7 +865,7 @@ class Sales_order extends PS_Controller
       }
 
       $ds = array(
-        'title' => "ใบสั่งขาย - {$job[$doc->job_type]}",
+        'title' => "ใบสั่งขาย - ".job_name($doc->job_type),
         'order' => $doc,
         'details' => $details,
         'sale' => $this->slp_model->get($doc->sale_id),

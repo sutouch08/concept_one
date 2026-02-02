@@ -132,7 +132,7 @@ function date_to_array($date1, $date2, $format = 'Y-m-d' )
     $current = strtotime($stepVal, $current);
   }
 
-  return $dates;      
+  return $dates;
 }
 
 
@@ -202,5 +202,94 @@ function selectTime($time='')
 		$sc .= '<option value="'.$hrs.'" '.is_selected($time, $hrs).'>'.$hrs.'</option>';
 	}
 	return $sc;
+}
+
+function is_valid_date($date)
+{
+  //--- check date is valid format Y-m-d
+  $Y = intval(date('Y', strtotime($date)));
+  $M = intval(date('m', strtotime($date)));
+  $D = intval(date('d', strtotime($date)));
+
+  if($Y > 2500 OR $Y < 2000)
+  {
+    return FALSE;
+  }
+
+  if($M < 1 OR $M > 12)
+  {
+    return FALSE;
+  }
+
+  if($M == 2 && ($D > 29 OR $D < 1))
+  {
+    return FALSE;
+  }
+
+  if($M == 1 OR $M == 3 OR $M == 5 OR $M == 7 OR $M == 8 OR $M == 10 OR $M == 12)
+  {
+    if($D > 31 OR $D < 1)
+    {
+      return FALSE;
+    }
+  }
+  else
+  {
+    if($D > 30 OR $D < 1)
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+function convert_date($date)
+{
+  if(empty($date))
+  {
+    return date('Y-m-d');
+  }
+
+  $date = str_replace('/', '-', $date);
+  $date = str_replace('.', '-', $date);
+  $arr = explode(' ', $date);
+  $date = $arr[0];
+  $date = explode('-', $date);
+
+  $d1 = $date[0];
+  $d2 = $date[1];
+  $d3 = $date[2];
+
+  $Y = $d1;
+  $M = $d2;
+  $D = $d3;
+
+  if(strlen($d1) === 4)
+  {
+    $Y = $d1;
+    $M = $d2;
+    $D = $d3;
+
+    if($d2 > 12)
+    {
+      $M = $d3;
+      $D = $d2;
+    }
+  }
+  else if(strlen($d3) === 4)
+  {
+    $Y = $d3;
+    $M = $d2;
+    $D = $d1;
+
+    if($d2 > 12)
+    {
+      $M = $d1;
+      $D = $d2;
+    }
+  }
+
+  return date('Y-m-d', strtotime("$Y-$M-$D"));
 }
  ?>

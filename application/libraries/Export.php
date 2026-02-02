@@ -42,7 +42,7 @@ class Export
 
     if( ! empty($dpmInvCodes))
     {
-      $dpmInvData = $this->ci->down_payment_invoice_model->get_down_payments_by_array($dpmInvCodes);
+      $dpmInvData = $this->ci->down_payment_invoice_model->get_sap_down_payments_by_array($dpmInvCodes);
     }
 
     return $dpmInvData;
@@ -289,8 +289,6 @@ class Export
 
         if($order->BaseType == 'POS')
         {
-          $payments[] = $order->BaseRef;
-
           $dpc = $this->ci->order_down_payment_model->get_invoice_by_target($order->BaseRef);
 
           if( ! empty($dpc))
@@ -299,6 +297,11 @@ class Export
             {
               $payments[] = $dpd->code;
             }
+          }
+
+          if($this->ci->order_pos_payment_model->get_amount($order->BaseRef) > 0)
+          {
+            $payments[] = $order->BaseRef;
           }
         }
         else
@@ -320,7 +323,7 @@ class Export
         $dpmVatSum = 0;
         $dpmDrawn = 'N';
 
-        $dpm = $this->get_dpm_by_base_ref($order->BaseRef);
+        $dpm = $this->get_dpm_by_base_ref($order->BaseRef);      
 
         if( ! empty($dpm))
         {
@@ -332,6 +335,9 @@ class Export
             $dpmVatSum += $dp->VatSum;
           }
         }
+
+        $docTotal = $order->DocTotal - $dpmAmount;
+        $vatSum = $order->VatSum - $dpmVatSum;
 
         //--- header
         $ds = array(
@@ -346,13 +352,13 @@ class Export
           'NumAtCard' => get_null($order->NumAtCard),
           'LicTradNum' => get_null($order->tax_id),
           'WTSum' => $order->WhtAmount,
-          'VatSum' => $order->VatSum,
+          'VatSum' => $vatSum > 0 ? $vatSum : 0, //$order->VatSum,
           'DiscPrcnt' => $order->DiscPrcnt,
           'DiscSum' => $order->DiscSum,
           'DiscSumFC' => 0.00,
           'DocCur' => $order->DocCur,
           'DocRate' => $order->DocRate,
-          'DocTotal' => $order->DocTotal,
+          'DocTotal' => $docTotal > 0 ? $docTotal : 0, //$order->DocTotal,
           'DocTotalFC' => 0.00,
           'RoundDif' => $order->RoundDif,
           'GroupNum' => $cust->GroupNum,

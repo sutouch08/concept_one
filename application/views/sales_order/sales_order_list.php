@@ -44,10 +44,8 @@
   <div class="col-lg-1-harf col-md-2 col-sm-1-harf col-xs-6 padding-5">
     <label>ประเภทงาน</label>
     <select class="form-control input-sm filter" name="job_type">
-      <option value="all">เลือก</option>
-      <option value="A" <?php echo is_selected('A', $job_type); ?>>งานปัก</option>
-      <option value="B" <?php echo is_selected('B', $job_type); ?>>งานรีด</option>
-      <option value="C" <?php echo is_selected('C', $job_type); ?>>งานสกรีน</option>
+      <option value="all">ทั้งหมด</option>
+      <?php echo select_job_type($job_type); ?>
     </select>
   </div>
   <div class="col-lg-1-harf col-md-2 col-sm-1-harf col-xs-6 padding-5">
@@ -64,17 +62,7 @@
     <label>State</label>
     <select class="form-control input-sm filter" name="state">
       <option value="all">ทั้งหมด</option>
-      <option value="1" <?php echo is_selected('1', $state); ?>>รอดำเนินการ</option>
-      <option value="2" <?php echo is_selected('2', $state); ?>>รอชำระเงิน</option>
-      <option value="3" <?php echo is_selected('3', $state); ?>>รอแบบ</option>
-      <option value="31" <?php echo is_selected('31', $state); ?>>ออกแบบเสร็จ</option>
-      <option value="32" <?php echo is_selected('32', $state); ?>>รอปริ้นเฟล็ก</option>
-      <option value="33" <?php echo is_selected('33', $state); ?>>ปริ้นเฟล็กเสร็จ</option>
-      <option value="4" <?php echo is_selected('4', $state); ?>>รอผลิต</option>
-      <option value="5" <?php echo is_selected('5', $state); ?>>กำลังผลิต</option>
-      <option value="6" <?php echo is_selected('6', $state); ?>>ผลิตเสร็จ</option>
-      <option value="7" <?php echo is_selected('7', $state); ?>>รอจัดส่ง</option>
-      <option value="8" <?php echo is_selected('8', $state); ?>>จัดส่งแล้ว</option>
+      <?php echo select_so_state($state); ?>
     </select>
   </div>
   <div class="col-lg-2 col-md-2-harf col-sm-3 col-xs-6 padding-5">

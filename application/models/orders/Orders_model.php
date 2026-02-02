@@ -8,13 +8,14 @@ class Orders_model extends CI_Model
     parent::__construct();
   }
 
-
-
   public function add(array $ds = array())
   {
     if( ! empty($ds))
     {
-      return $this->db->insert('orders', $ds);
+      if($this->db->insert('orders', $ds))
+      {
+        return $this->db->insert_id();
+      }
     }
 
     return FALSE;
@@ -62,6 +63,38 @@ class Orders_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_order_by_reference($reference)
+  {
+    $rs = $this->db->where('reference', $reference)->order_by('id', 'DESC')->get('orders');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
+  }
+
+
+  //---- for dispatch TikTok
+  public function get_order_by_tracking($tracking_number)
+  {
+    $rs = $this->db
+    ->where('shipping_code IS NOT NULL', NULL, FALSE)
+    ->where('shipping_code', $tracking_number)
+    ->order_by('id', 'DESC')
+    ->limit(1)
+    ->get('orders');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
   }
 
 
@@ -133,6 +166,11 @@ class Orders_model extends CI_Model
   public function remove_detail($id)
   {
     return $this->db->where('id', $id)->delete('order_details');
+  }
+
+  public function remove_all_details($order_code)
+  {
+    return $this->db->where('order_code', $order_code)->delete('order_details');
   }
 
 
@@ -456,17 +494,17 @@ class Orders_model extends CI_Model
   }
 
 
-
   public function get_order_code_by_reference($reference)
   {
     $rs = $this->db->select('code')->where('reference', $reference)->get('orders');
+
     if($rs->num_rows() > 0)
     {
       return $rs->row()->code;
     }
 
-    return FALSE;
-  }
+    return NULL;
+  }  
 
 
   public function get_active_order_code_by_reference($reference)
@@ -837,7 +875,7 @@ class Orders_model extends CI_Model
     return NULL;
   }
 
-  
+
   private function zone_in($zone)
   {
     $ds = array();

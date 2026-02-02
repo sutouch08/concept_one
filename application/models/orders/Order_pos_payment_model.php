@@ -55,6 +55,21 @@ class Order_pos_payment_model extends CI_Model
 
     return NULL;
   }
+
+
+  public function get_amount($code)
+  {
+    $rs = $this->db->select_sum('amount')->where('code', $code)->get($this->tb);
+
+    if($rs->num_rows() === 0)
+    {
+      return $rs->row()->amount;
+    }
+
+    return 0;
+  }
+
+
 } //--- end class
 
  ?>

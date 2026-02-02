@@ -21,22 +21,18 @@ class Zone extends PS_Controller
   {
     $filter = array(
       'code' => get_filter('code', 'z_code', ''),
-      'uname' => get_filter('uname', 'z_uname', ''),
       'warehouse' => get_filter('warehouse', 'z_warehouse', ''),
       'customer' => get_filter('customer', 'z_customer', ''),
-      'active' => get_filter('active', 'z_active', 'all')
+      'user_id' => get_filter('user_id', 'z_user_id', 'all'),
+      'active' => get_filter('active', 'z_active', 'all'),
+      'is_pickface' => get_filter('is_pickface', 'z_pickface', 'all')
     );
 
 		//--- แสดงผลกี่รายการต่อหน้า
 		$perpage = get_rows();
-		//--- หาก user กำหนดการแสดงผลมามากเกินไป จำกัดไว้แค่ 300
-		if($perpage > 300)
-		{
-			$perpage = 20;
-		}
 
 		$segment  = 4; //-- url segment
-		$rows     = $this->zone_model->count_rows($filter);
+		$rows = $this->zone_model->count_rows($filter);
 		//--- ส่งตัวแปรเข้าไป 4 ตัว base_url ,  total_row , perpage = 20, segment = 3
 		$init = pagination_config($this->home.'/index/', $rows, $perpage, $segment);
 		$list = $this->zone_model->get_list($filter, $perpage, $this->uri->segment($segment));
@@ -61,6 +57,7 @@ class Zone extends PS_Controller
   {
     if($this->pm->can_edit)
     {
+      $this->load->helper('employee');
       $zone = $this->zone_model->get($code);
       $ds['ds'] = $zone;
       $ds['customers'] = $this->zone_model->get_customers($code);
@@ -81,6 +78,64 @@ class Zone extends PS_Controller
   }
 
 
+  public function update()
+  {
+    $sc = TRUE;
+
+    if($this->input->post('zone_code'))
+    {
+      $zone_code = $this->input->post('zone_code');
+      $user_id = get_null($this->input->post('user_id'));
+      $pickface = $this->input->post('is_pickface') == 1 ? 1 : 0;
+
+      $zone = $this->zone_model->get($zone_code);
+
+      if( ! empty($zone))
+      {
+        $arr = array(
+          'user_id' => $user_id,
+          'is_pickface' => $pickface
+        );
+
+        if( ! $this->zone_model->update($zone->id, $arr))
+        {
+          $sc = FALSE;
+          $this->error = "Update data failed";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Invalid Zone Code";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Missing required parameter : zone_code";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+
+
+  public function update_pickface()
+  {
+    $sc = TRUE;
+    $id = $this->input->post('id');
+    $is_pickface = $this->input->post('is_pickface') == 1 ? 1 : 0;
+
+    $arr = array('is_pickface' => $is_pickface);
+
+    if( ! $this->zone_model->update($id, $arr))
+    {
+      $sc = FALSE;
+      $this->error = "Update failed";
+    }
+
+    echo $sc === TRUE ? 'success' : $this->error;
+  }
+  
 
   public function update_owner()
   {
@@ -516,7 +571,7 @@ class Zone extends PS_Controller
 
   public function clear_filter()
   {
-    $filter = array('z_code', 'z_uname', 'z_customer', 'z_warehouse', 'z_active');
+    $filter = array('z_code', 'z_uname', 'z_customer', 'z_warehouse', 'z_active', 'z_pickface');
     clear_filter($filter);
   }
 

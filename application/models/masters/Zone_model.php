@@ -55,7 +55,6 @@ class Zone_model extends CI_Model
   }
 
 
-
   //--- remove customer from connected zone
   public function delete_customer($id)
   {
@@ -149,44 +148,36 @@ class Zone_model extends CI_Model
   public function count_rows(array $ds = array())
   {
 
-    if(!empty($ds['customer']))
+    if( ! empty($ds['customer']))
     {
       return $this->count_rows_customer($ds);
     }
 
-    $this->db
-    ->from('zone AS z')
-    ->join('user AS u', 'z.user_id = u.id', 'left');
-
-    if(!empty($ds['code']))
+    if( ! empty($ds['code']))
     {
       $this->db
       ->group_start()
-      ->like('z.code', $ds['code'])
-      ->or_like('z.name', $ds['code'])
-      ->group_end();
-    }
-
-    if(!empty($ds['uname']))
-    {
-      $this->db
-      ->group_start()
-      ->like('u.uname', $ds['uname'])
-      ->or_like('u.name', $ds['uname'])
+      ->like('code', $ds['code'])
+      ->or_like('name', $ds['code'])
       ->group_end();
     }
 
     if(!empty($ds['warehouse']))
     {
-      $this->db->where('z.warehouse_code', $ds['warehouse']);
+      $this->db->where('warehouse_code', $ds['warehouse']);
     }
 
     if(isset($ds['active']) && $ds['active'] != 'all')
     {
-      $this->db->where('z.active', $ds['active']);
+      $this->db->where('active', $ds['active']);
     }
 
-    return $this->db->count_all_results();
+    if(isset($ds['is_pickface']) && $ds['is_pickface'] != 'all')
+    {
+      $this->db->where('is_pickface', $ds['is_pickface']);
+    }
+
+    return $this->db->count_all_results('zone');
   }
 
 
@@ -198,7 +189,6 @@ class Zone_model extends CI_Model
     ->from('zone_customer')
     ->join('zone', 'zone.code = zone_customer.zone_code')
     ->join('customers', 'zone_customer.customer_code = customers.code')
-    ->join('user', 'zone.user_id = user.id','left')
     ->like('customers.code', $ds['customer'])
     ->or_like('customers.name', $ds['customer']);
 
@@ -211,15 +201,6 @@ class Zone_model extends CI_Model
       ->group_end();
     }
 
-    if(!empty($ds['uname']))
-    {
-      $this->db
-      ->group_start()
-      ->like('user.uname', $ds['uname'])
-      ->or_like('user.name', $ds['uname'])
-      ->group_end();
-    }
-
     if(!empty($ds['warehouse']))
     {
       $this->db->where('zone.warehouse_code', $ds['warehouse']);
@@ -230,11 +211,13 @@ class Zone_model extends CI_Model
       $this->db->where('zone.active', $ds['active']);
     }
 
+    if(isset($ds['is_pickface']) && $ds['is_pickface'] != 'all')
+    {
+      $this->db->where('zone.is_pickface', $ds['is_pickface']);
+    }
+
     return $this->db->count_all_results();
   }
-
-
-
 
 
   public function get_list(array $ds = array(), $perpage = NULL, $offset = NULL)
@@ -246,12 +229,11 @@ class Zone_model extends CI_Model
     }
 
     $this->db
-    ->select('zone.code AS code, zone.name AS name, zone.warehouse_code')
-    ->select('zone.old_code, zone.active')
-    ->select('warehouse.name AS warehouse_name, user.uname, user.name AS display_name')
+    ->select('zone.id, zone.code AS code, zone.name AS name, zone.warehouse_code')
+    ->select('zone.old_code, zone.active, zone.is_pickface')
+    ->select('warehouse.name AS warehouse_name')
     ->from('zone')
-    ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left')
-    ->join('user', 'zone.user_id = user.id', 'left');
+    ->join('warehouse', 'warehouse.code = zone.warehouse_code', 'left');
 
     if(!empty($ds['code']))
     {
@@ -259,15 +241,6 @@ class Zone_model extends CI_Model
       ->group_start()
       ->like('zone.code', $ds['code'])
       ->or_like('zone.name', $ds['code'])
-      ->group_end();
-    }
-
-    if(!empty($ds['uname']))
-    {
-      $this->db
-      ->group_start()
-      ->like('user.uname', $ds['uname'])
-      ->or_like('user.name', $ds['uname'])
       ->group_end();
     }
 
@@ -279,6 +252,11 @@ class Zone_model extends CI_Model
     if(isset($ds['active']) && $ds['active'] != 'all')
     {
       $this->db->where('zone.active', $ds['active']);
+    }
+
+    if(isset($ds['is_pickface']) && $ds['is_pickface'] != 'all')
+    {
+      $this->db->where('zone.is_pickface', $ds['is_pickface']);
     }
 
     $this->db->order_by('zone.date_upd', 'DESC');
@@ -305,9 +283,8 @@ class Zone_model extends CI_Model
   private function get_list_customer(array $ds = array(), $perpage = NULL, $offset = NULL)
   {
     $this->db
-    ->select('zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name, zone.old_code, zone.active')
+    ->select('zone.id, zone.code AS code, zone.name AS name, warehouse.name AS warehouse_name, zone.old_code, zone.active, zone.is_pickface')
     ->select('customers.code AS customer_code, customers.name AS customer_name')
-    ->select('user.uname, user.name AS display_name')
     ->from('zone_customer')
     ->join('zone', 'zone.code = zone_customer.zone_code')
     ->join('customers', 'zone_customer.customer_code = customers.code')
@@ -332,18 +309,14 @@ class Zone_model extends CI_Model
       ->group_end();
     }
 
-    if(!empty($ds['uname']))
-    {
-      $this->db
-      ->group_start()
-      ->like('user.uname', $ds['uname'])
-      ->or_like('user.name', $ds['uname'])
-      ->group_end();
-    }
-
     if(!empty($ds['warehouse']))
     {
       $this->db->where('zone.warehouse_code', $ds['warehouse']);
+    }
+
+    if(isset($ds['is_pickface']) && $ds['is_pickface'] != 'all')
+    {
+      $this->db->where('zone.is_pickface', $ds['is_pickface']);
     }
 
     $this->db->group_by('zone.code');
@@ -363,10 +336,6 @@ class Zone_model extends CI_Model
 
     return FALSE;
   }
-
-
-
-
 
 
   public function count_customer($code)
@@ -404,12 +373,10 @@ class Zone_model extends CI_Model
   }
 
 
-
-
   public function get($code)
   {
     $rs = $this->db
-    ->select('zone.id, zone.code, zone.name, zone.warehouse_code, zone.user_id')
+    ->select('zone.id, zone.code, zone.name, zone.warehouse_code, zone.active, zone.user_id, zone.is_pickface')
     ->select('warehouse.name AS warehouse_name, warehouse.role, warehouse_role.name AS role_name, warehouse.is_consignment')
     ->select('user.uname, user.name AS display_name')
     ->from('zone')
@@ -441,10 +408,6 @@ class Zone_model extends CI_Model
   }
 
 
-
-
-
-
   public function get_name($code)
   {
     $rs = $this->db->select('name')->where('code', $code)->get('zone');
@@ -455,7 +418,6 @@ class Zone_model extends CI_Model
 
     return NULL;
   }
-
 
 
   public function get_zone_detail_in_warehouse($code, $warehouse)
@@ -557,6 +519,37 @@ class Zone_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_pickface_zone()
+  {
+    $rs = $this->db->where('is_pickface', 1)->where('active', 1)->get('zone');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
+  }
+
+
+  public function get_default_zone($whsCode)
+  {
+    $rs = $this->db
+    ->where('warehouse_code', $whsCode)
+    ->where('is_default', 1)
+    ->order_by('id', 'DESC')
+    ->limit(1)
+    ->get('zone');
+
+    if($rs->num_rows() === 1)
+    {
+      return $rs->row();
+    }
+
+    return NULL;
   }
 } //--- end class
 

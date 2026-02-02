@@ -22,6 +22,7 @@ class Order_invoice extends PS_Controller
     $this->load->model('masters/shop_model');
     $this->load->model('masters/pos_model');
     $this->load->model('masters/invoice_customer_model');
+    $this->load->model('masters/payment_methods_model');
     $this->load->model('address/address_model');
     $this->load->helper('discount');
     $this->load->helper('shop');
@@ -951,6 +952,7 @@ class Order_invoice extends PS_Controller
     echo json_encode($arr);
   }
 
+
   private function add_by_pos($ds)
   {
     $sc = TRUE;
@@ -1299,6 +1301,7 @@ class Order_invoice extends PS_Controller
                 'shipped_date' => now(),
                 'user' => $this->_user->uname,
                 'channels_code' => $order->channels_code,
+                'payment_role' => $order->is_term ? 5 : 1,
                 'isWht' => $ds->whtPrcnt > 0 ? 1 : 0,
                 'WhtPrcnt' => $ds->whtPrcnt,
                 'WhtAmount' => $ds->whtAmount,
@@ -1655,6 +1658,7 @@ class Order_invoice extends PS_Controller
                   'shipped_date' => now(),
                   'user' => $this->_user->uname,
                   'channels_code' => $order->channels_code,
+                  'payment_role' => $order->payment_role,
                   'isWht' => $order->WhtPrcnt > 0 ? 1 : 0,
                   'WhtPrcnt' => $order->WhtPrcnt,
                   'WhtAmount' => $order->WhtAmount,
@@ -1918,6 +1922,8 @@ class Order_invoice extends PS_Controller
 
         if( ! empty($order))
         {
+          $payment_role = $order->is_term ? 5 : 1;
+
           $order->billCode = $order->code;
           $order->taxStatus = 'N';
           $order->refType = $order->role == 'S' ? 'WO' : ($order->role == 'U' ? 'WU' : ($order->role == 'C' ? 'WC' : 'WS'));
@@ -1931,6 +1937,7 @@ class Order_invoice extends PS_Controller
           $order->totalDownAmount = 0;
           $order->whtPrcnt = $order->WhtPrcnt;
           $order->whtAmount = $order->WhtAmount;
+          $order->payment_role = $payment_role;
 
           $result = $this->add_by_order($order);
 
@@ -1968,7 +1975,6 @@ class Order_invoice extends PS_Controller
 
     echo json_encode($arr);
   }
-
 
 
   public function add_invoice()
@@ -2149,6 +2155,7 @@ class Order_invoice extends PS_Controller
                 'shipped_date' => now(),
                 'user' => $this->_user->uname,
                 'channels_code' => $order->channels_code,
+                'payment_role' => $ds->payment_role,
                 'isWht' => $ds->whtPrcnt > 0 ? 1 : 0,
                 'WhtPrcnt' => $ds->whtPrcnt,
                 'WhtAmount' => $ds->whtAmount,
@@ -2861,15 +2868,29 @@ class Order_invoice extends PS_Controller
       $dpmVatSum = 0;
 
       //---- ต้องการเลขที่ใบกำกับภาษีเงินมัดจำ จากเอกสารรับเงินมัดจำ เพื่อไปดึงยอดรับเงินมัดจำจาก ODPI
-      //--$dpm = $this->get_dpm_by_base_ref($order->BaseRef);
-      $dpm = $this->down_payment_invoice_model->get_invoice_by_base_ref($order->BaseRef);
-      
+      $dpmInvData = NULL;
+      $dpmInvCodes = [];
+      $dpm = $this->order_down_payment_model->get_invoice_by_target($order->BaseRef);
+
       if( ! empty($dpm))
       {
         foreach($dpm as $dp)
         {
-          $dpmAmount += $dp->DocTotal;
-          $dpmVatSum += $dp->VatSum;
+          $dpmInvCodes[] = $dp->invoice_code;
+        }
+      }
+
+      if( ! empty($dpmInvCodes))
+      {
+        $dpmInvData = $this->down_payment_invoice_model->get_down_payments_by_array($dpmInvCodes);
+      }
+
+      if( ! empty($dpmInvData))
+      {
+        foreach($dpmInvData as $dpmInv)
+        {
+          $dpmAmount += $dpmInv->DocTotal;
+          $dpmVatSum += $dpmInv->VatSum;
         }
       }
 
@@ -2918,6 +2939,7 @@ class Order_invoice extends PS_Controller
     }
   }
 
+
   public function get_new_code($prefix, $run_digit = 3, $date = NULL)
   {
     $date = empty($date) ? date('Y-m-d') : ($date < '2020-01-01' ? date('Y-m-d') : $date);
@@ -2938,6 +2960,7 @@ class Order_invoice extends PS_Controller
 
     return $new_code;
   }
+
 
   public function getInvoicePrefixData($type = 'ORDER', $is_term = FALSE, $tax_status = 'N')
   {
