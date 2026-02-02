@@ -298,6 +298,18 @@ function parseDefault(value, def){
 	return value;
 }
 
+function parseDefaultInt(value, def) {
+  let val = parseInt(value);
+  return isNaN(val) ? def : val;
+}
+
+
+function parseDefaultFloat(value, def) {
+  let val = parseFloat(value);
+  return isNaN(val) ? def : val;
+}
+
+
 function parseDiscountPercent(price, discAmount)
 {
   if(price > 0 && discAmount > 0 && price > discAmount)
@@ -624,4 +636,8 @@ function is_true(val) {
     default :
       return false;
   }
+}
+
+function refresh() {
+  window.location.reload();
 }

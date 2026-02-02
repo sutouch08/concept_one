@@ -310,7 +310,7 @@ class Products_model extends CI_Model
         {
           $this->db->where('products.price <', $ds['price']);
         }
-        
+
         if($ds['operater'] == 'more_than')
         {
           $this->db->where('products.price >', $ds['price']);
@@ -560,13 +560,14 @@ class Products_model extends CI_Model
   }
 
 
-
-
   public function add(array $ds = array())
   {
-    if(!empty($ds))
+    if( ! empty($ds))
     {
-      return  $this->db->replace('products', $ds);
+      if($this->db->insert('products', $ds))
+      {
+        return $this->db->insert_id();
+      }
     }
 
     return FALSE;
@@ -609,7 +610,15 @@ class Products_model extends CI_Model
   }
 
 
+  public function update_by_id($id, array $ds = array())
+  {
+    if( ! empty($ds))
+    {
+      return $this->db->where('id', $id)->update('products', $ds);
+    }
 
+    return FALSE;
+  }
 
 
   public function get_status($field, $item)

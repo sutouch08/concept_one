@@ -21,7 +21,7 @@
 			<div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group hide">
 			<label class="col-sm-3 control-label no-padding-right">รหัสเก่า</label>
 			<div class="col-xs-12 col-sm-3">
 				<input type="text" name="old_code" id="old_code" class="width-100" value="<?php echo $old_code; ?>" placeholder="รหัสเก่า (ไม่บังคับ)" />
@@ -233,18 +233,6 @@
 			<div class="col-xs-12 col-sm-3">
 				<label style="padding-top:5px;">
 					<input name="can_sell" class="ace ace-switch ace-switch-7" type="checkbox" id="can_sell" value="1" <?php echo is_checked($can_sell,1); ?> />
-					<span class="lbl"></span>
-				</label>
-			</div>
-			<div class="help-block col-xs-12 col-sm-reset inline red"></div>
-		</div>
-
-
-		<div class="form-group hide">
-			<label class="col-sm-3 control-label no-padding-right">API</label>
-			<div class="col-xs-12 col-sm-3">
-				<label style="padding-top:5px;">
-					<input name="is_api" class="ace ace-switch ace-switch-7" type="checkbox" id="is_api" value="1" <?php echo is_checked($is_api,1); ?>/>
 					<span class="lbl"></span>
 				</label>
 			</div>

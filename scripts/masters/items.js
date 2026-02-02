@@ -1,4 +1,5 @@
 var HOME = BASE_URL + 'masters/items/';
+var click = 0;
 
 function addNew(){
   window.location.href = HOME + 'add_new';
@@ -21,91 +22,210 @@ function viewDetail(id) {
 }
 
 
+function add() {
+  if(click == 0) {
+    click = 1;
+    clearErrorByClass('r');
+
+    let error = 0;
+
+    let item = {
+      'code' : $('#code').val().trim(),
+      'name' : $('#name').val().trim(),
+      'style' : $('#style').val().trim(),
+      'color' : $('#color').val().trim(),
+      'size' : $('#size').val().trim(),
+      'barcode' : $('#barcode').val().trim(),
+      'cost' : parseDefaultFloat($('#cost').val(), 0),
+      'price' : parseDefaultFloat($('#price').val(), 0),
+      'unit_code' : $('#unit_code').val(),
+      'unit_id' : $('#unit_code option:selected').data('id'),
+      'unit_group' : $('#unit_code option:selected').data('groupid'),
+      'sale_vat_code' : $('#sale-vat-code').val(),
+      'sale_vat_rate' : parseDefaultFloat($('#sale-vat-code option:selected').data('rate'), 0.00),
+      'purchase_vat_code' : $('#purchase-vat-code').val(),
+      'purchase_vat_rate' : parseDefaultFloat($('#purchase-vat-code option:selected').data('rate'), 0.00),
+      'brand_code' : $('#brand').val(),
+      'group_code' : $('#group').val(),
+      'main_group_code' : $('#mainGroup').val(),
+      'sub_group_code' : $('#subGroup').val(),
+      'category_code' : $('#category').val(),
+      'kind_code' : $('#kind').val(),
+      'type_code' : $('#type').val(),
+      'year' : $('#year').val(),
+      'count_stock' : $('#count_stock').is(':checked') ? 1 : 0,
+      'can_sell' : $('#can_sell').is(':checked') ? 1 : 0,
+      'active' : $('#active').is(':checked') ? 1 : 0
+    };
+
+    if(item.code.length == 0) {
+      $('#code').hasError('Required');
+      click = 0;
+      return false;
+    }
+
+    if(item.name.length == 0) {
+      $('#name').hasError('Required');
+      click = 0;
+      return false;
+    }
+
+    load_in();
+
+    $.ajax({
+      url:HOME + 'add',
+      type:'POST',
+      cache:false,
+      data:{
+        'data' : JSON.stringify(item)
+      },
+      success:function(rs) {
+        click = 0;
+        load_out();
+
+        if(isJson(rs)) {
+          let ds = JSON.parse(rs);
+
+          if(ds.status === 'success') {
+            if(ds.ex == 1) {
+              swal({
+                title:'Info',
+                text:ds.message,
+                type:'info',
+                html:true
+              }, function() {
+                addNew();
+              });
+            }
+            else {
+              swal({
+                title:'Success',
+                type:'success',
+                timer:1000
+              });
+
+              setTimeout(() => {
+                addNew();
+              }, 1200);
+            }
+          }
+          else {
+            showError(ds.message);
+          }
+        }
+        else {
+          showError(rs);
+        }
+      },
+      error:function(rs) {
+        click = 0;
+        showError(rs);
+      }
+    })
+  }
+}
+
+
 function update() {
-	let error = 0;
+  if(click == 0) {
+    click = 1;
+    clearErrorByClass('r');
 
-	let data = {};
+    let item = {
+      'id' : $('#id').val(),
+      'code' : $('#code').val().trim(),
+      'name' : $('#name').val().trim(),
+      'style' : $('#style').val().trim(),
+      'color' : $('#color').val().trim(),
+      'size' : $('#size').val().trim(),
+      'barcode' : $('#barcode').val().trim(),
+      'cost' : parseDefaultFloat($('#cost').val(), 0),
+      'price' : parseDefaultFloat($('#price').val(), 0),
+      'unit_code' : $('#unit_code').val(),
+      'unit_id' : $('#unit_code option:selected').data('id'),
+      'unit_group' : $('#unit_code option:selected').data('groupid'),
+      'sale_vat_code' : $('#sale-vat-code').val(),
+      'sale_vat_rate' : parseDefaultFloat($('#sale-vat-code option:selected').data('rate'), 0.00),
+      'purchase_vat_code' : $('#purchase-vat-code').val(),
+      'purchase_vat_rate' : parseDefaultFloat($('#purchase-vat-code option:selected').data('rate'), 0.00),
+      'brand_code' : $('#brand').val(),
+      'group_code' : $('#group').val(),
+      'main_group_code' : $('#mainGroup').val(),
+      'sub_group_code' : $('#subGroup').val(),
+      'category_code' : $('#category').val(),
+      'kind_code' : $('#kind').val(),
+      'type_code' : $('#type').val(),
+      'year' : $('#year').val(),
+      'count_stock' : $('#count_stock').is(':checked') ? 1 : 0,
+      'can_sell' : $('#can_sell').is(':checked') ? 1 : 0,
+      'active' : $('#active').is(':checked') ? 1 : 0
+    };
 
-  data.id = $('#id').val();
-	data.code = $('#code').val().trim();
-	data.old_code = $('#old_code').val().trim();
-	data.name = $('#name').val().trim(); // required
-	data.style = $('#style').val().trim();
-	data.old_style = $('#old_style').val().trim();
-	data.color = $('#color').val().trim();
-	data.size = $('#size').val().trim();
-	data.barcode = $('#barcode').val().trim();
-	data.cost = parseDefault(parseFloat($('#cost').val()), 0);
-	data.price = parseDefault(parseFloat($('#price').val()), 0);
-	data.unit_code = $('#unit_code').val();
-  data.unit_id = $('#unit_code option:selected').data('id');
-  data.unit_group = $('#unit_code option:selected').data('groupid');
-  data.sale_vat_code = $('#sale-vat-code').val();
-  data.sale_vat_rate = parseDefault(parseFloat($('#sale-vat-code option:selected').data('rate')), 0.00);
-  data.purchase_vat_code = $('#purchase-vat-code').val();
-  data.purchase_vat_rate = parseDefault(parseFloat($('#purchase-vat-code option:selected').data('rate')), 0.00);
-	data.brand_code = $('#brand').val();
-	data.group_code = $('#group').val();
-	data.main_group_code = $('#mainGroup').val();
-	data.sub_group_code = $('#subGroup').val();
-	data.category_code = $('#category').val();
-	data.kind_code = $('#kind').val();
-	data.type_code = $('#type').val();
-	data.year = $('#year').val();
-	data.count_stock = $('#count_stock').is(':checked') ? 1 : 0;
-	data.can_sell = $('#can_sell').is(':checked') ? 1 : 0;
-	data.is_api = $('#is_api').is(':checked') ? 1 : 0;
-	data.active = $('#active').is(':checked') ? 1 : 0;
+    if(item.code.length == 0) {
+      $('#code').hasError('Required');
+      click = 0;
+      return false;
+    }
 
-	if(data.name.length === 0) {
-		set_error($('#name'), $('#name-error'), "required");
-		error++;
-	}
-	else {
-		clear_error($('#name'), $('#name-error'));
-	}
+    if(item.name.length == 0) {
+      $('#name').hasError('Required');
+      click = 0;
+      return false;
+    }
 
-	if(error > 0) {
-		return false;
-	}
+    load_in();
 
-	load_in();
+    $.ajax({
+      url:HOME + 'update',
+      type:'POST',
+      cache:false,
+      data:{
+        'data' : JSON.stringify(item)
+      },
+      success:function(rs) {
+        click = 0;
+        load_out();
 
-	$.ajax({
-		url:HOME + 'update',
-		type:'POST',
-		cache:false,
-		data:{
-			"data" : JSON.stringify(data)
-		},
-		success:function(rs) {
-			load_out();
-			var rs = rs.trim();
-			if(rs == 'success') {
-				swal({
-					title:"Success",
-					type:'success',
-					timer:1000
-				});
-			}
-			else {
-				swal({
-					title:'Error!',
-					text:rs,
-					type:'error'
-				})
-			}
-		},
-		error:function(xhr) {
-			load_out();
-			swal({
-				title:"Error!",
-				text:'Error : '+xhr.responseText,
-				type:'error',
-				html:true
-			})
-		}
-	})
+        if(isJson(rs)) {
+          let ds = JSON.parse(rs);
+
+          if(ds.status === 'success') {
+            if(ds.ex == 1) {
+              swal({
+                title:'Info',
+                text:ds.message,
+                type:'info',
+                html:true
+              }, function() {
+                refresh()
+              });
+            }
+            else {
+              swal({
+                title:'Success',
+                type:'success',
+                timer:1000
+              });
+
+              setTimeout(() => {
+                refresh();
+              }, 1200);
+            }
+          }
+          else {
+            showError(ds.message);
+          }
+        }
+        else {
+          showError(rs);
+        }
+      },
+      error:function(rs) {
+        click = 0;
+        showError(rs);
+      }
+    })
+  }
 }
 
 
@@ -124,6 +244,7 @@ $('#style').autocomplete({
     }
   }
 });
+
 
 $('#color').autocomplete({
   source: BASE_URL + 'auto_complete/get_color_code_and_name',
@@ -245,4 +366,31 @@ function getTemplate(){
 
 function getSearch(){
   $('#searchForm').submit();
+}
+
+
+function sendToSap(id) {
+  load_in();
+
+  $.ajax({
+    url:BASE_URL + 'masters/items/send_to_sap/'+id,
+    type:'POST',
+    cache:false,
+    success:function(rs){
+      load_out();
+      if(rs === 'success'){
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+      }else{
+        swal({
+          title:'Error',
+          text:rs,
+          type:'error'
+        });
+      }
+    }
+  })
 }

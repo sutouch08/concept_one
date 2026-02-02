@@ -6,6 +6,7 @@
 	<div class="col-sm-6">
 		<p class="pull-right top-p">
 			<button type="button" class="btn btn-sm btn-warning" onclick="goBack()"><i class="fa fa-arrow-left"></i> Back</button>
+			<button type="button" class="btn btn-sm btn-success" onclick="sendToSap(<?php echo $id; ?>)"><i class="fa fa-send"></i> Send to SAP</button>
 		</p>
 	</div>
 </div><!-- End Row -->
@@ -21,7 +22,7 @@
 			<div class="help-block col-xs-12 col-sm-reset inline red" id="code-error"></div>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group hide">
 			<label class="col-sm-3 control-label no-padding-right">รหัสเก่า</label>
 			<div class="col-xs-12 col-sm-3">
 				<input type="text" name="old_code" id="old_code" class="width-100" value="<?php echo $old_code; ?>" placeholder="รหัสเก่า (ไม่บังคับ)" />
@@ -44,7 +45,7 @@
 			<div class="help-block col-xs-12 col-sm-reset inline red" id="style-error"></div>
 		</div>
 
-		<div class="form-group">
+		<div class="form-group hide">
 			<label class="col-sm-3 control-label no-padding-right">รุ่นเก่า</label>
 			<div class="col-xs-12 col-sm-3">
 				<input type="text" name="old_style" id="old_style" class="width-100" value="<?php echo $old_style; ?>" placeholder="รหัสรุ่นเก่า (ไม่บังคับ)"/>

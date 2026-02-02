@@ -1,4 +1,5 @@
 <?php $this->load->view('include/header'); ?>
+<?php $this->load->view('masters/product_items/style'); ?>
 <div class="row">
 	<div class="col-lg-6 col-md-6 col-sm-6 hidden-xs padding-5">
     <h3 class="title"><?php echo $this->title; ?></h3>
@@ -126,18 +127,14 @@
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 table-responsive">
 		<table class="table table-striped table-bordered table-hover" style="min-width:1530px;">
 			<thead>
-				<tr>
-					<th style="width:130px;"></th>
+				<tr class="font-size-11">
+					<th class="fix-width-120 middle"></th>
 					<th class="fix-width-40 middle text-center">ลำดับ</th>
+					<th class="fix-width-150 middle text-center">บาร์โค้ด</th>
 					<th class="fix-width-200 middle text-center">รหัส</th>
 					<th class="min-width-200 middle text-center">สินค้า</th>
-					<th class="fix-width-150 middle text-center">รุ่น</th>
-					<th class="fix-width-150 middle text-center">บาร์โค้ด</th>
-					<th class="fix-width-60 middle text-center">สี</th>
-					<th class="fix-width-60 middle text-center">ไซส์</th>
 					<th class="fix-width-80 middle text-center">ราคา</th>
 					<th class="fix-width-150 middle text-center">กลุ่ม</th>
-					<th class="fix-width-150 middle text-center">หมวดหมู่</th>
 					<th class="fix-width-80 middle text-center">ปี</th>
 					<th class="fix-width-40 middle text-center">ขาย</th>
 					<th class="fix-width-40 middle text-center">Active</th>
@@ -147,14 +144,9 @@
 			<?php if(!empty($data)) : ?>
 				<?php $no = $this->uri->segment(4) + 1; ?>
 				<?php foreach($data as $rs) : ?>
-					<tr id="row-<?php echo $no; ?>" class="font-size-12">
-						<td class="middle text-right">
+					<tr id="row-<?php echo $no; ?>" class="font-size-11">
+						<td class="middle">
 							<button type="button" class="btn btn-minier btn-info" onclick="viewDetail(<?php echo $rs->id; ?>)"><i class="fa fa-eye"></i></button>
-							<?php if($this->pm->can_add) : ?>
-								<button type="button" class="btn btn-minier btn-primary" onclick="duplicate(<?php echo $rs->id; ?>)">
-									<i class="fa fa-copy"></i>
-								</button>
-							<?php endif; ?>
 							<?php if($this->pm->can_edit) : ?>
 								<button type="button" class="btn btn-minier btn-warning" onclick="getEdit(<?php echo $rs->id; ?>)">
 									<i class="fa fa-pencil"></i>
@@ -165,17 +157,16 @@
 									<i class="fa fa-trash"></i>
 								</button>
 							<?php endif; ?>
+							<button type="button" class="btn btn-minier btn-success" title="Send to SAP" onclick="sendToSap(<?php echo $rs->id; ?>)">
+								<i class="fa fa-send"></i>
+							</button>
 						</td>
 						<td class="middle text-center"><?php echo $no; ?></td>
+						<td class="middle"><?php echo $rs->barcode; ?></td>
 						<td class="middle"><?php echo $rs->code; ?></td>
 						<td class="middle"><?php echo $rs->name; ?></td>
-						<td class="middle"><?php echo $rs->style_code; ?></td>
-						<td class="middle"><?php echo $rs->barcode; ?></td>
-						<td class="middle text-center"><?php echo $rs->color_code; ?></td>
-						<td class="middle text-center"><?php echo $rs->size_code; ?></td>
 						<td class="middle text-right"><?php echo number($rs->price, 2); ?></td>
 						<td class="middle"><?php echo $rs->group; ?></td>
-						<td class="middle"><?php echo $rs->category; ?></td>
 						<td class="middle text-center"><?php echo $rs->year; ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->can_sell); ?></td>
 						<td class="middle text-center"><?php echo is_active($rs->active); ?></td>
