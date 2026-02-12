@@ -2045,7 +2045,7 @@ class Order_invoice extends PS_Controller
         'branch_code' => get_null($ds->branch_code),
         'branch_name' => get_null($ds->branch_name),
         'address' => get_null($ds->address),
-        'sub_district' => get_null($ds->sub_district),
+        'sub_district' => get_null($ds->subDistrict),
         'district' => get_null($ds->district),
         'province' => get_null($ds->province),
         'postcode' => get_null($ds->postcode),
