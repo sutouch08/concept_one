@@ -15,8 +15,8 @@ class stock_model extends CI_Model
     ->from("OBIN")
     ->join("OIBQ", "OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs", "left")
     ->join("OITM", "OIBQ.ItemCode = OITM.ItemCode", "left")
-    ->join("OWHS", "OWHS.WhsCode = OBIN.WhsCode", "left")
-    ->where("OWHS.U_MAIN", "Y");
+    ->join("OWHS", "OWHS.WhsCode = OBIN.WhsCode", "left");
+    //->where("OWHS.U_MAIN", "Y");
 
 		if(getConfig("SYSTEM_BIN_LOCATION") == 0)
 		{
@@ -50,7 +50,7 @@ class stock_model extends CI_Model
     $qr .= "WHERE OIBQ.ItemCode = N'{$pd_code}' ";
     $qr .= "AND OBIN.BinCode = '{$zone_code}'";
 
-    $rs = $this->ms->query($qr);    
+    $rs = $this->ms->query($qr);
 
     if($rs->num_rows() == 1)
     {
@@ -89,8 +89,8 @@ class stock_model extends CI_Model
     ->from("OIBQ")
     ->join("OBIN", "OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs", "left")
     ->join("OWHS", "OWHS.WhsCode = OBIN.WhsCode", "left")
-    ->where("OIBQ.ItemCode", $item)
-    ->where("OWHS.U_MAIN", "Y");
+    ->where("OIBQ.ItemCode", $item);
+    //->where("OWHS.U_MAIN", "Y");
 
 		if(getConfig("SYSTEM_BIN_LOCATION") == 0)
 		{
@@ -158,7 +158,7 @@ class stock_model extends CI_Model
     ->from("OIBQ")
     ->join("OBIN", "OBIN.WhsCode = OIBQ.WhsCode AND OBIN.AbsEntry = OIBQ.BinAbs", "left")
     ->join("OWHS", "OWHS.WhsCode = OBIN.WhsCode", "left")
-    ->where("OWHS.U_MAIN", "Y")
+    //->where("OWHS.U_MAIN", "Y")
     ->where("ItemCode", $item);
 
 		if(getConfig("SYSTEM_BIN_LOCATION") == 0)
