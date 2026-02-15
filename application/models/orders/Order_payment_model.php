@@ -165,9 +165,9 @@ class Order_payment_model extends CI_Model
 
   public function add(array $ds = array())
   {
-    if(!empty($ds))
+    if( ! empty($ds))
     {
-      return $this->db->replace($this->tb, $ds);
+      return $this->db->insert($this->tb, $ds);
     }
 
     return FALSE;
@@ -183,6 +183,19 @@ class Order_payment_model extends CI_Model
     }
 
     return FALSE;
+  }
+
+
+  public function get_payments($code)
+  {
+    $rs = $this->db->where('order_code', $code)->get('order_payment');
+
+    if($rs->num_rows() > 0)
+    {
+      return $rs->result();
+    }
+
+    return NULL;
   }
 
 
@@ -268,7 +281,7 @@ class Order_payment_model extends CI_Model
     $rs = $this->db->select('order_code')
     ->where('order_code', $code)
     ->get($this->tb);
-    if($rs->num_rows() === 1)
+    if($rs->num_rows() > 0)
     {
       return TRUE;
     }

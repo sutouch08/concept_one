@@ -1,5 +1,10 @@
 <?php $this->load->view('include/header'); ?>
 <?php $isAdmin = $this->_SuperAdmin; ?>
+<script src="<?php echo base_url(); ?>assets/js/dropzone.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.colorbox.js"></script>
+<link rel="stylesheet" href="<?php echo base_url();?>assets/css/dropzone.css" />
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/colorbox.css" />
+<?php $this->load->view('orders/style'); ?>
 
 <div class="row">
 	<div class="col-lg-2 col-md-2 col-sm-2 padding-5 hidden-xs">
@@ -11,7 +16,7 @@
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 padding-5">
     	<p class="pull-right top-p text-right" >
 				<button type="button" class="btn btn-xs btn-warning top-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-				<?php if($order->is_term == 0 && $order->status == 1 && $order->state < 3 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
+				<?php if($order->is_term == 0 && $order->status == 1 && $order->TotalBalance > 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
 				<button type="button" class="btn btn-xs btn-info top-btn" onclick="payOrder()">แจ้งชำระเงิน</button>
 				<?php endif; ?>
 				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
@@ -121,6 +126,7 @@
 <script src="<?php echo base_url(); ?>scripts/print/print_order.js?v=<?php echo date('YmdH'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/print/print_address.js?v=<?php echo date('YmdH'); ?>"></script>
 <script src="<?php echo base_url(); ?>scripts/orders/order_grid.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_image.js?v=<?php echo date('YmdH'); ?>"></script>
 
 
 <?php $this->load->view('include/footer'); ?>

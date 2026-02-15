@@ -29,13 +29,13 @@ class Orders extends PS_Controller
     $this->load->model('orders/discount_model');
 
     $this->load->helper('order');
+    $this->load->helper('image');
     $this->load->helper('channels');
     $this->load->helper('saleman');
     $this->load->helper('payment_method');
     $this->load->helper('customer');
     $this->load->helper('users');
     $this->load->helper('state');
-    $this->load->helper('product_images');
     $this->load->helper('discount');
     $this->load->helper('warehouse');
 
@@ -1168,6 +1168,7 @@ class Orders extends PS_Controller
 
 			$state = $this->order_state_model->get_order_state($code);
 	    $ost = array();
+
 	    if(!empty($state))
 	    {
 	      foreach($state as $st)
@@ -1201,6 +1202,8 @@ class Orders extends PS_Controller
 	    $ds['details'] = $details;
 	    $ds['addr']  = $ship_to;
 	    $ds['banks'] = $banks;
+      $ds['payments'] = $this->order_payment_model->get_payments($code);
+      $ds['images'] = get_order_images($code);
 			$ds['cancle_reason'] = ($order->state == 9 ? $this->orders_model->get_cancle_reason($code) : NULL);
 	    $ds['allowEditDisc'] = getConfig('ALLOW_EDIT_DISCOUNT') == 1 ? TRUE : FALSE;
 	    $ds['allowEditPrice'] = getConfig('ALLOW_EDIT_PRICE') == 1 ? TRUE : FALSE;
@@ -2645,15 +2648,10 @@ class Orders extends PS_Controller
       if(!empty($order))
       {
         //--- ยอดรวมหลังหักส่วนลด ตาม item
-        $amount = $this->orders_model->get_order_total_amount($order->code);
-
-        //--- ส่วนลดท้ายบิล
-        $bDisc = $order->bDiscAmount;
-
-        $pay_amount = $amount - $bDisc;
+        $amount = $order->TotalBalance;
 
         $ds = array(
-          'pay_amount' => $pay_amount,
+          'pay_amount' => $amount,
           'id_sender' => empty($order->id_sender) ? FALSE : $order->id_sender,
           'id_address' => empty($order->id_address) ? FALSE : $order->id_address
         );
@@ -2690,6 +2688,101 @@ class Orders extends PS_Controller
   }
 
 
+  public function upload_images($code)
+  {
+    $sc = TRUE;
+    $folder = 'orders';
+
+    if( ! empty( $_FILES ) )
+    {
+      $files = $_FILES['file'];
+
+      if( ! empty($code))
+      {
+        $this->load->model('orders/order_image_model');
+
+        if( is_string($files['name']) )
+        {
+          $img_name = $code.'-'.floor(microtime(true) * 1000);
+          $rs = $this->do_upload($files, $img_name, $folder);
+
+          if($rs !== TRUE)
+          {
+            $sc = FALSE;
+            $this->error = $rs;
+          }
+          else
+          {
+            $arr = array(
+              'order_code' => $code,
+              'image_path' => $img_name
+            );
+
+            if( ! $this->order_image_model->add($arr))
+            {
+              $sc = FALSE;
+              $this->error = "Failed to add image to data";
+            }
+          }
+        }
+
+        if( is_array($files['name']) )
+        {
+          $fileCount = count($files['name']);
+
+          for($i = 0; $i < $fileCount; $i++)
+          {
+            if($sc === FALSE) { break; }
+
+            $file = array(
+              'name' => $files['name'][$i],
+              'type' => $files['type'][$i],
+              'size' => $files['size'][$i],
+              'tmp_name' => $files['tmp_name'][$i],
+              'error' => $files['error'][$i]
+            );
+
+            $img_name = $code.'-'.floor(microtime(true) * 1000);
+
+            $rs = $this->do_upload($file, $img_name, $folder);
+
+            if( $rs !== TRUE)
+            {
+              $sc = FALSE;
+              $this->error = $rs;
+            }
+            else
+            {
+              $arr = array(
+                'order_code' => $code,
+                'image_path' => $img_name
+              );
+
+              if( ! $this->order_image_model->add($arr))
+              {
+                $sc = FALSE;
+                $this->error = "Failed to add image to data";
+              }
+            }
+          }//--------- For Loop
+        }//----- endif
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "Missing required parameter : Order Code";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "No image found";
+    }
+
+    $this->_response($sc);
+  }
+
+
   public function confirm_payment()
   {
     $sc = TRUE;
@@ -2706,6 +2799,8 @@ class Orders extends PS_Controller
       $m = $this->input->post('payMin');
       $dhm = $date.' '.$h.':'.$m.':00';
       $pay_date = db_date($dhm, TRUE);
+      $img_name = $order_code.'-'.date('Ymdhis');
+      $folder = 'payments';
 
       $order = $this->orders_model->get($order_code);
 
@@ -2716,7 +2811,8 @@ class Orders extends PS_Controller
         'pay_date' => $pay_date,
         'id_account' => $this->input->post('id_account'),
         'acc_no' => $this->input->post('acc_no'),
-        'user' => $this->_user->uname
+        'user' => $this->_user->uname,
+        'img' => $img_name
       );
 
       //--- บันทึกรายการ
@@ -2751,7 +2847,7 @@ class Orders extends PS_Controller
 
       if($file !== FALSE)
       {
-        $rs = $this->do_upload($file, $order_code);
+        $rs = $this->do_upload($file, $img_name, $folder);
         if($rs !== TRUE)
         {
           $sc = FALSE;
@@ -2764,15 +2860,15 @@ class Orders extends PS_Controller
   }
 
 
-  public function do_upload($file, $code)
+  public function do_upload($file, $img_name, $folder = 'payments')
   {
-    $this->load->library('upload');
     $sc = TRUE;
-    $image_path = $this->config->item('image_path').'payments/';
+    $this->load->library('upload');
+    $image_path = $this->config->item('image_path').$folder.'/';
     $image 	= new Upload($file);
     if( $image->uploaded )
     {
-      $image->file_new_name_body = $code; 		//--- เปลี่ยนชือ่ไฟล์ตาม order_code
+      $image->file_new_name_body = $img_name;
       $image->image_resize			 = TRUE;		//--- อนุญาติให้ปรับขนาด
       $image->image_retio_fill	 = TRUE;		//--- เติกสีให้เต็มขนาดหากรูปภาพไม่ได้สัดส่วน
       $image->file_overwrite		 = TRUE;		//--- เขียนทับไฟล์เดิมได้เลย
@@ -2787,7 +2883,7 @@ class Orders extends PS_Controller
 
       if( ! $image->processed )	//--- ถ้าไม่สำเร็จ
       {
-        $sc 	= $image->error;
+        $sc = $image->error;
       }
     } //--- end if
 
@@ -2797,18 +2893,86 @@ class Orders extends PS_Controller
   }
 
 
-  public function view_payment_detail()
+  public function remove_image()
+  {
+    $sc = TRUE;
+    $this->load->model('orders/order_image_model');
+
+    $id = $this->input->post('id_image');
+    $folder = 'orders';
+
+    $image = $this->order_image_model->get($id);
+
+    if( ! empty($image))
+    {
+      if( ! $this->order_image_model->delete($id))
+      {
+        $sc = FALSE;
+        $this->error = "Failed to delete image data";
+      }
+
+      if($sc === TRUE)
+      {
+        delete_image($image->image_path, $folder);
+      }
+    }
+
+    $this->_response($sc);
+  }
+
+
+  public function get_order_images()
+  {
+    $sc = TRUE;
+    $this->load->model('orders/order_image_model');
+    $code = $this->input->post('code');
+    $ds = [];
+
+    if( ! empty($code))
+    {
+      $images = $this->order_image_model->get_order_images($code);
+
+      if( ! empty($images))
+      {
+        $folder = 'orders';
+
+        foreach($images as $img)
+        {
+          $ds[] = array(
+            'id' => $img->id,
+            'image_path' => get_image_path($img->image_path, $folder)
+          );
+        }
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      set_error('required');
+    }
+
+    $arr = array(
+      'status' => $sc === TRUE ? 'success' : 'failed',
+      'message' => $sc === TRUE ? 'success' : $this->error,
+      'data' => $ds
+    );
+
+    echo json_encode($arr);
+  }
+
+
+  public function view_payment_detail($id)
   {
     $this->load->model('orders/order_payment_model');
     $this->load->model('masters/bank_model');
     $sc = TRUE;
     $code = $this->input->post('order_code');
-    $rs = $this->order_payment_model->get($code);
+    $rs = $this->order_payment_model->get_by_id($id);
 
     if(!empty($rs))
     {
       $bank = $this->bank_model->get_account_detail($rs->id_account);
-      $img  = payment_image_url($code); //--- order_helper
+      $img  = payment_image_url($rs->img); //--- order_helper
       $ds   = array(
         'order_code' => $code,
         'orderAmount' => number($rs->order_amount, 2),
@@ -2847,73 +3011,67 @@ class Orders extends PS_Controller
   public function save_address()
   {
     $sc = TRUE;
-		$customer_code = trim($this->input->post('customer_code'));
-		$cus_ref = trim($this->input->post('customer_ref'));
+    $ds = json_decode($this->input->post('data'));
 
-    if(!empty($customer_code) OR !empty($cus_ref))
+    if(empty($ds) OR empty($ds->customer_code) OR empty($ds->customer_ref))
+    {
+      $sc = FALSE;
+      set_error('required');
+    }
+
+    if($sc === TRUE)
     {
       $this->load->model('address/address_model');
-      $id = $this->input->post('id_address');
 
-      if(!empty($id))
+      if( ! empty($ds->id_address))
       {
         $arr = array(
-          'code' => $cus_ref,
-          'customer_code' => $customer_code,
-          'name' => trim($this->input->post('name')),
-          'address' => trim($this->input->post('address')),
-          'sub_district' => trim($this->input->post('sub_district')),
-          'district' => trim($this->input->post('district')),
-          'province' => trim($this->input->post('province')),
-          'postcode' => trim($this->input->post('postcode')),
-					'country' => trim($this->input->post('country')),
-          'phone' => trim($this->input->post('phone')),
-          'email' => trim($this->input->post('email')),
-          'alias' => trim($this->input->post('alias'))
+          'code' => $ds->customer_ref,
+          'customer_code' => $ds->customer_code,
+          'name' => $ds->name,
+          'address' => $ds->address,
+          'sub_district' => $ds->sub_district,
+          'district' => $ds->district,
+          'province' => $ds->province,
+          'postcode' => $ds->postcode,
+          'country' => $ds->country,
+          'phone' => get_null($ds->phone),
+          'email' => get_null($ds->email),
+          'alias' => $ds->alias
         );
 
-        if(! $this->address_model->update_shipping_address($id, $arr))
+        if( ! $this->address_model->update_shipping_address($ds->id_address, $arr))
         {
           $sc = FALSE;
-          $this->error = 'แก้ไขที่อยู่ไม่สำเร็จ';
+          $this->error = "แก้ไขที่อยู่ไม่สำเร็จ";
         }
-
       }
       else
       {
         $arr = array(
-          'address_code' => '0000', //$this->address_model->get_new_code($this->input->post('customer_ref')),
-          'code' => $cus_ref,
-          'customer_code' => $customer_code,
-          'name' => trim($this->input->post('name')),
-          'address' => trim($this->input->post('address')),
-          'sub_district' => trim($this->input->post('sub_district')),
-          'district' => trim($this->input->post('district')),
-          'province' => trim($this->input->post('province')),
-          'postcode' => trim($this->input->post('postcode')),
-					'country' => trim($this->input->post('country')),
-          'phone' => trim($this->input->post('phone')),
-          'email' => trim($this->input->post('email')),
-          'alias' => trim($this->input->post('alias'))
+          'code' => $ds->customer_ref,
+          'customer_code' => $ds->customer_code,
+          'name' => $ds->name,
+          'address' => $ds->address,
+          'sub_district' => $ds->sub_district,
+          'district' => $ds->district,
+          'province' => $ds->province,
+          'postcode' => $ds->postcode,
+          'country' => $ds->country,
+          'phone' => get_null($ds->phone),
+          'email' => get_null($ds->email),
+          'alias' => $ds->alias
         );
 
-        $rs = $this->address_model->add_shipping_address($arr);
-
-        if($rs === FALSE)
+        if( ! $this->address_model->add_shipping_address($arr))
         {
           $sc = FALSE;
-          $this->error = 'เพิ่มที่อยู่ไม่สำเร็จ';
+          $this->error = "เพิ่มที่อยู่ไม่สำเร็จ";
         }
-
       }
     }
-    else
-    {
-      $sc = FALSE;
-      $this->error = 'Missing required parameter : customer code';
-    }
 
-    echo $sc === TRUE ? 'success' : $this->error;
+    $this->_response($sc);
   }
 
 

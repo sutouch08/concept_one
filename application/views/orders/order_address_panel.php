@@ -3,7 +3,7 @@ $cn = get_permission("SOCNDO", get_cookie("uid"), get_cookie("id_profile")); //-
 $canCancleShipped = ($cn->can_add + $cn->can_edit + $cn->can_delete) > 0 ? TRUE : FALSE;
  ?>
 <?php if($order->role == "S") : ?>
-	<?php 	$paymentLabel = paymentLabel($order->code, paymentExists($order->code), $order->is_paid);	?>
+	<?php 	$paymentLabel = paymentLabel($payments); //paymentLabel($order->code, paymentExists($order->code), $order->is_paid);	?>
 	<?php if(!empty($paymentLabel)) : ?>
 		<div class="row">
 		  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5">

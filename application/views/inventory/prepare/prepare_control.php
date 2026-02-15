@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-lg-2-harf col-md-2-harf col-sm-2-harf col-xs-6 padding-5">
     <label>รหัสโซน</label>
-    <input type="text" class="form-control input-sm" id="barcode-zone" value="" autofocus/>
+    <input type="text" class="form-control input-sm" id="barcode-zone" value="<?php echo $default_zone; ?>" />
   </div>
   <div class="col-lg-1 col-md-1-harf col-sm-1-harf col-xs-6 padding-5">
     <label class="not-show">changeZone</label>
@@ -13,7 +13,7 @@
   </div>
   <div class="col-lg-2 col-md-2 col-sm-2-harf col-xs-6 padding-5">
     <label>บาร์โค้ดสินค้า</label>
-    <input type="text" class="form-control input-sm" id="barcode-item" />
+    <input type="text" class="form-control input-sm" id="barcode-item" autofocus/>
   </div>
   <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3 padding-5">
     <label class="not-show">Submit</label>
@@ -21,6 +21,6 @@
   </div>
 
 
-  <input type="hidden" name="zone_code" id="zone_code" value=""/>
+  <input type="hidden" name="zone_code" id="zone_code" value="<?php echo $default_zone; ?>"/>
 
 </div>

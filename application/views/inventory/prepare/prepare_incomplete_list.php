@@ -54,9 +54,18 @@
             <span class="lbl">  บังคับจบ</span>
           </label>
         </div>
-        <div id="close-bar" class="<?php echo $close; ?>">
-          <button type="button" class="btn btn-sm btn-success" onclick="finishPrepare()">จัดเสร็จแล้ว</button>
-        </div>
+        <?php if($order->state == 4) : ?>
+          <div id="close-bar" class="<?php echo $close; ?>">
+            <button type="button" class="btn btn-sm btn-success" onclick="finishPrepare()">จัดเสร็จแล้ว</button>
+          </div>
+        <?php endif; ?>
+        <?php if($order->state == 7) : ?>
+          <div id="bill-bar">
+            <button type="button" class="btn btn-sm btn-primary close-order" id="btn-bill" onclick="confirmOrder('<?php echo $order->code; ?>')">
+              เปิดบิลตัดสต็อก
+            </button>
+          </div>
+        <?php endif; ?>
       </td>
     </tr>
 
@@ -64,12 +73,20 @@
 
   <tr>
     <td colspan="6" class="text-center">
-      <div id="close-bar">
-        <button type="button" class="btn btn-sm btn-success" onclick="finishPrepare()">จัดเสร็จแล้ว</button>
-      </div>
+      <?php if($order->state == 4) : ?>
+        <div id="close-bar">
+          <button type="button" class="btn btn-sm btn-success" onclick="finishPrepare()">จัดเสร็จแล้ว</button>
+        </div>
+      <?php endif; ?>
+      <?php if($order->state == 7) : ?>
+        <div id="bill-bar">
+          <button type="button" class="btn btn-sm btn-primary close-order" id="btn-bill" onclick="confirmOrder('<?php echo $order->code; ?>')">
+            เปิดบิลตัดสต็อก
+          </button>
+        </div>
+      <?php endif; ?>
     </td>
   </tr>
-
 <?php endif; ?>
       </tbody>
     </table>

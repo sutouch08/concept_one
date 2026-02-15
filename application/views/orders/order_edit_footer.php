@@ -83,14 +83,14 @@
       </div>
     </div>
 
-    <div class="form-group hide">
+    <div class="form-group">
       <label class="col-lg-8 col-md-8 col-sm-8 col-xs-6 control-label no-padding-right">ชำระแล้ว</label>
       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 padding-5 last">
         <input type="text" class="form-control input-sm text-right" id="paid-amount" value="<?php echo number($order->paidAmount, 2); ?>" disabled/>
       </div>
     </div>
 
-    <div class="form-group hide">
+    <div class="form-group">
       <label class="col-lg-8 col-md-8 col-sm-8 col-xs-6 control-label no-padding-right">คงเหลือ</label>
       <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 padding-5 last">
         <input type="text" class="form-control input-sm text-right" id="total-balance" value="<?php echo number($order->TotalBalance, 2); ?>" disabled>

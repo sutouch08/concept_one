@@ -1,22 +1,29 @@
 <?php
-function paymentLabel($order_code, $isExists, $isPaid)
+
+function paymentLabel($payments = NULL)
 {
 	$sc = "";
-	if( $isExists === TRUE )
+
+	if( ! empty($payments))
 	{
-    if( $isPaid == 1 )
+		foreach($payments as $rs)
 		{
-			$sc .= '<button type="button" class="btn btn-sm btn-success" onClick="viewPaymentDetail()">';
-			$sc .= 'จ่ายเงินแล้ว | ดูรายละเอียด';
-			$sc .= '</button>';
-		}
-		else
-		{
-			$sc .= '<button type="button" class="btn btn-sm btn-primary" onClick="viewPaymentDetail()">';
-			$sc .= 'แจ้งชำระแล้ว | ดูรายละเอียด';
-			$sc .= '</button>';
+			if($rs->valid ==1)
+			{
+				$sc .= '<button type="button" class="btn btn-sm btn-success margin-right-5" onClick="viewPaymentDetail('.$rs->id.')">';
+				$sc .= 'จ่ายเงินแล้ว | '.number($rs->pay_amount,2);
+				$sc .= '</button>';
+			}
+			else
+			{
+				$sc .= '<button type="button" class="btn btn-sm btn-primary margin-right-5" onClick="viewPaymentDetail('.$rs->id.')">';
+				$sc .= 'แจ้งชำระแล้ว | '.number($rs->pay_amount,2);
+				$sc .= '</button>';
+			}
+
 		}
 	}
+
 
 	return $sc;
 }
@@ -171,5 +178,19 @@ function state_name($state)
 	return empty($stateList[$state]) ? "Unknow" : $stateList[$state];
 }
 
+
+function get_order_images($code)
+{
+	$ci =& get_instance();
+
+	$rs = $ci->db->where('order_code', $code)->get('order_images');
+
+	if($rs->num_rows() > 0)
+	{
+		return $rs->result();
+	}
+
+	return NULL;
+}
 
  ?>

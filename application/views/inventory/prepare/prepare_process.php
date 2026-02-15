@@ -14,10 +14,9 @@
 </div>
 
 <hr class="padding-5" />
-<?php if($order->state != 4) : ?>
+<?php if($order->state != 4 && $order->state != 7) : ?>
 <?php   $this->load->view('inventory/prepare/invalid_state'); ?>
 <?php else : ?>
-
   <div class="row">
     <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6 padding-5 padding-top-10">
 			<div class="input-group">
@@ -73,7 +72,9 @@
 
   <hr class="margin-top-10 margin-bottom-10"/>
 
-  <?php $this->load->view('inventory/prepare/prepare_control'); ?>
+  <?php if($order->state == 4) : ?>
+    <?php $this->load->view('inventory/prepare/prepare_control'); ?>
+  <?php endif; ?>    
 
   <hr class="margin-top-10 margin-bottom-10"/>
 

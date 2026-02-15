@@ -1,21 +1,17 @@
-// JavaScript Document
-
-function viewImage(imageUrl)
-{
+function viewImage(imageUrl) {
 	var image = '<img src="'+imageUrl+'" width="100%" />';
 	$("#imageBody").html(image);
 	$("#imageModal").modal('show');
 }
 
 
+function viewPaymentDetail(id) {
+	let order_code = $('#order_code').val();
 
-
-function viewPaymentDetail()
-{
-	var order_code = $('#order_code').val();
 	load_in();
+
 	$.ajax({
-		url: BASE_URL + 'orders/orders/view_payment_detail',
+		url: BASE_URL + 'orders/orders/view_payment_detail/'+id,
 		type:"POST",
 		cache:"false",
 		data:{
@@ -38,38 +34,23 @@ function viewPaymentDetail()
 }
 
 
-
-
-
-
 $("#emsNo").keyup(function(e) {
-    if( e.keyCode == 13 )
+	if( e.keyCode == 13 )
 	{
 		saveDeliveryNo();
 	}
 });
 
 
-
-
-
-
-function inputDeliveryNo()
-{
+function inputDeliveryNo() {
 	$("#deliveryModal").modal('show');
 }
 
 
-
-
-
-
-function saveDeliveryNo()
-{
+function saveDeliveryNo() {
 	var deliveryNo 	= $("#emsNo").val();
 	var order_code 	= $("#order_code").val();
-	if( deliveryNo != '')
-	{
+	if( deliveryNo != '')	{
 		$("#deliveryModal").modal('hide');
 		$.ajax({
 			url: BASE_URL + 'orders/orders/update_shipping_code/',
@@ -77,7 +58,8 @@ function saveDeliveryNo()
 			cache:"false",
 			data:{
 				"shipping_code" : deliveryNo,
-				"order_code" : order_code },
+				"order_code" : order_code
+			},
 			success: function(rs){
 				var rs = $.trim(rs);
 				if( rs == 'success')
@@ -90,103 +72,114 @@ function saveDeliveryNo()
 }
 
 
+function submitPayment() {
+		var order_code = $("#order_code").val();
+		var id_account = $("#id_account").val();
+		var acc_no = $('#acc_no').val();
+		var image = $("#image")[0].files[0];
+		var payAmount = parseDefault(parseFloat($("#payAmount").val()), 0);
+		var orderAmount = parseDefault(parseFloat($("#orderAmount").val()), 0);
+		var payDate = $("#payDate").val();
+		var payHour = $("#payHour").val();
+		var payMin = $("#payMin").val();
 
-
-
-
-function submitPayment()
-{
-	var order_code	= $("#order_code").val();
-	var id_account	= $("#id_account").val();
-	var acc_no 			= $('#acc_no').val();
-	var image				= $("#image")[0].files[0];
-	var payAmount		= parseDefault(parseFloat($("#payAmount").val()), 0);
-	var orderAmount = parseDefault(parseFloat($("#orderAmount").val()), 0);
-	var payDate			= $("#payDate").val();
-	var payHour			= $("#payHour").val();
-	var payMin			= $("#payMin").val();
-
-	if( order_code == '' ){
-		$('#payment-error').text('ไม่พบไอดีออเดอร์กรุณาออกจากหน้านี้แล้วเข้าใหม่อีกครั้ง');
-		return false;
-	}
-
-	if( id_account == '' ){
-		$('#payment-error').text('ไม่พบข้อมูลบัญชีธนาคาร กรุณาออกจากหน้านี้แล้วลองแจ้งชำระอีกครั้ง');
-		return false;
-	}
-
-	if(acc_no == ''){
-		$('#payment-error').text('ไม่พลเลขที่บัญชี กรุณาออกจากหน้านี้แล้วลองใหม่อีกครั้ง');
-		return false;
-	}
-
-	if( image == '' ){
-		$('#payment-error').text('ไม่สามารถอ่านข้อมูลรูปภาพที่แนบได้ กรุณาแนบไฟล์ใหม่อีกครั้ง');
-		return false;
-	}
-
-	if( payAmount <= 0 ){
-		$('#payment-error').text("ยอดชำระไม่ถูกต้อง");
-		return false;
-	}
-
-	if( !isDate(payDate) ){
-		$('#payment-error').text('วันที่ไม่ถูกต้อง');
-		return false;
-	}
-
-	$("#paymentModal").modal('hide');
-
-	var fd = new FormData();
-	fd.append('image', $('input[type=file]')[0].files[0]);
-	fd.append('order_code', order_code);
-	fd.append('id_account', id_account);
-	fd.append('acc_no', acc_no);
-	fd.append('payAmount', payAmount);
-	fd.append('orderAmount', orderAmount);
-	fd.append('payDate', payDate);
-	fd.append('payHour', payHour);
-	fd.append('payMin', payMin);
-	fd.append('type', 'OR');
-
-	load_in();
-	$.ajax({
-		url: BASE_URL + 'orders/orders/confirm_payment',
-		type:"POST",
-		cache: "false",
-		data: fd,
-		processData:false,
-		contentType: false,
-		success: function(rs){
-			load_out();
-			var rs = $.trim(rs);
-			if( rs == 'success')
-			{
-				swal({
-					title : 'สำเร็จ',
-					text : 'แจ้งชำระเงินเรียบร้อยแล้ว',
-					type: 'success',
-					timer: 1000
-				});
-
-				clearPaymentForm();
-				setTimeout(function(){
-					window.location.reload();
-				}, 1200);
-
-			}
-			else if( rs == 'fail' )
-			{
-				swal("ข้อผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง", "error");
-			}
-			else
-			{
-				swal("ข้อผิดพลาด", rs, "error");
-			}
+		if( order_code == '' ) {
+			$('#payment-error').text('ไม่พบไอดีออเดอร์กรุณาออกจากหน้านี้แล้วเข้าใหม่อีกครั้ง');
+			return false;
 		}
-	});
-}
+
+		if( id_account == '' ){
+			$('#payment-error').text('ไม่พบข้อมูลบัญชีธนาคาร กรุณาออกจากหน้านี้แล้วลองแจ้งชำระอีกครั้ง');
+			return false;
+		}
+
+		if(acc_no == ''){
+			$('#payment-error').text('ไม่พลเลขที่บัญชี กรุณาออกจากหน้านี้แล้วลองใหม่อีกครั้ง');
+			return false;
+		}
+
+		if( image == '' ){
+			$('#payment-error').text('ไม่สามารถอ่านข้อมูลรูปภาพที่แนบได้ กรุณาแนบไฟล์ใหม่อีกครั้ง');
+			return false;
+		}
+
+		if( payAmount <= 0 ){
+			$('#payment-error').text("ยอดชำระไม่ถูกต้อง");
+			return false;
+		}
+
+		if( !isDate(payDate) ){
+			$('#payment-error').text('วันที่ไม่ถูกต้อง');
+			return false;
+		}
+
+		$("#paymentModal").modal('hide');
+
+		var fd = new FormData();
+		fd.append('image', $('input[type=file]')[0].files[0]);
+		fd.append('order_code', order_code);
+		fd.append('id_account', id_account);
+		fd.append('acc_no', acc_no);
+		fd.append('payAmount', payAmount);
+		fd.append('orderAmount', orderAmount);
+		fd.append('payDate', payDate);
+		fd.append('payHour', payHour);
+		fd.append('payMin', payMin);
+		fd.append('type', 'OR');
+
+		load_in();
+		$.ajax({
+			url: BASE_URL + 'orders/orders/confirm_payment',
+			type:"POST",
+			cache: "false",
+			data: fd,
+			processData:false,
+			contentType: false,
+			success: function(rs){
+				load_out();
+				var rs = $.trim(rs);
+				if( rs == 'success')
+				{
+					swal({
+						title : 'สำเร็จ',
+						text : 'แจ้งชำระเงินเรียบร้อยแล้ว',
+						type: 'success',
+						timer: 1000
+					});
+
+					clearPaymentForm();
+					setTimeout(function(){
+						window.location.reload();
+					}, 1200);
+
+				}
+				else if( rs == 'fail' )
+				{
+					swal("ข้อผิดพลาด", "ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง", "error");
+				}
+				else
+				{
+					swal("ข้อผิดพลาด", rs, "error");
+				}
+			}
+		});
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -565,85 +558,69 @@ function reloadAddressTable()
 }
 
 
-
-
-
-
 function saveAddress()
 {
-	var customer_code = $('#customerCode').val();
-	var code 			= $('#customer_ref').val();
-	var name			= $("#Fname").val();
-	var addr			= $("#address1").val();
-	var subdistrict = $('#sub_district').val();
-	var district  = $('#district').val();
-	var province  = $('#province').val();
-	var country = $('#country').val() == "" ? "Thailand" : $('#country').val();
-	var email			= $("#email").val();
-	var alias 		= $("#alias").val();
+	clearErrorByClass('a');
 
+	let country = $('#s-country').val().trim();
 
-	if( name == '' ){
-		swal('กรุณาระบุชื่อผู้รับ');
+	let h = {
+		'id_address' : $('#id_address').val(),
+		'customer_code' : $('#customerCode').val().trim(),
+		'customer_ref' : $('#customer_ref').val().trim(),
+		'name' : $('#Fname').val().trim(),
+		'address' : $('#s-address').val().trim(),
+		'sub_district' : $('#s-sub-district').val().trim(),
+		'district' : $('#s-district').val().trim(),
+		'province' : $('#s-province').val().trim(),
+		'postcode' : $('#s-postcode').val().trim(),
+		'country' : country == "" ? "Thailand" : country,
+		'phone' : $('#s-phone').val().trim(),
+		'email' : $('#s-email').val().trim(),
+		'alias' : $('#s-alias').val().trim()
+	}
+
+	if(h.name.length == 0) {
+		$('#Fname').hasError();
 		return false;
 	}
 
-	if( addr.length == 0 ){
-		swal('กรุณาระบุที่อยู่');
+	if(h.address.length == 0) {
+		$('#s-address').hasError();
 		return false;
 	}
 
-	if(subdistrict.length == 0){
-		swal('กรุณาระบุตำบล');
+	if(h.sub_district.length == 0) {
+		$('#s-sub-district').hasError();
 		return false;
 	}
 
-
-	if(district.length == 0){
-		swal('กรุณาระบุอำเภอ');
+	if(h.district.length == 0) {
+		$('#s-district').hasError();
 		return false;
 	}
 
-	if(province.length == 0){
-		swal('กรุณาระบุจังหวัด');
+	if(h.province.length == 0) {
+		$('#s-province').hasError();
 		return false;
 	}
 
-
-	if( alias == '' ){
-		swal('กรุณาตั้งชื่อให้ที่อยู่');
+	if(h.alias.length == 0) {
+		$('#s-alias').hasError();
 		return false;
 	}
-
-	// if( email != '' && ! validEmail(email) ){
-	// 	swal("อีเมล์ไม่ถูกต้องกรุณาตรวจสอบ");
-	// 	return false;
-	// }
-
-	var ds = [];
-
-	ds.push( {"name" : "id_address", "value" : $("#id_address").val() } );
-	ds.push( {"name" : "customer_code", "value" : $("#customerCode").val() });
-	ds.push( {"name" : "customer_ref", "value" : $("#customer_ref").val() } );
-	ds.push( {"name" : "name", "value" : $("#Fname").val() } );
-	ds.push( {"name" : "address", "value" : $("#address1").val() } );
-	ds.push( {"name" : "sub_district", "value" : $("#sub_district").val() } );
-	ds.push( {"name" : "district", "value" : $("#district").val() } );
-	ds.push( {"name" : "province", "value" : $("#province").val() } );
-	ds.push( {"name" : "postcode", "value" : $("#postcode").val() } );
-	ds.push( {"name" : "country", "value" : country});
-	ds.push( {"name" : "phone", "value" : $("#adr-phone").val() } );
-	ds.push( {"name" : "email", "value" : $("#email").val() } );
-	ds.push( {"name" : "alias", "value" : $("#alias").val() } );
 
 	$("#addressModal").modal('hide');
 
 	load_in();
+
 	$.ajax({
 		url:BASE_URL + 'orders/orders/save_address',
 		type:"POST",
 		cache:"false",
-		data: ds,
+		data: {
+			'data' : JSON.stringify(h)
+		},
 		success: function(rs){
 			load_out();
 			var rs = $.trim(rs);
@@ -663,9 +640,6 @@ function saveAddress()
 }
 
 
-
-
-
 function addNewAddress()
 {
 	clearAddressField();
@@ -674,7 +648,7 @@ function addNewAddress()
 
 
 
-$('#sub_district').autocomplete({
+$('#s-sub-district').autocomplete({
 	source:BASE_URL + 'auto_complete/sub_district',
 	autoFocus:true,
 	open:function(event){
@@ -682,19 +656,19 @@ $('#sub_district').autocomplete({
 		$ul.css('width', 'auto');
 	},
 	close:function(){
-		var rs = $.trim($(this).val());
-		var adr = rs.split('>>');
-		if(adr.length == 4){
-			$('#sub_district').val(adr[0]);
-			$('#district').val(adr[1]);
-			$('#province').val(adr[2]);
-			$('#postcode').val(adr[3]);
+		let adr = $(this).val().trim().split('>>');
+		if(adr.length == 4) {
+			$('#s-sub-district').val(adr[0]);
+			$('#s-district').val(adr[1]);
+			$('#s-province').val(adr[2]);
+			$('#s-postcode').val(adr[3]);
+			$('#s-phone').focus();
 		}
 	}
 });
 
 
-$('#district').autocomplete({
+$('#s-district').autocomplete({
 	source:BASE_URL + 'auto_complete/district',
 	autoFocus:true,
 	open:function(event){
@@ -702,29 +676,35 @@ $('#district').autocomplete({
 		$ul.css('width', 'auto');
 	},
 	close:function(){
-		var rs = $.trim($(this).val());
-		var adr = rs.split('>>');
+		let adr = $(this).val().trim().split('>>');
 		if(adr.length == 3){
-			$('#district').val(adr[0]);
-			$('#province').val(adr[1]);
-			$('#postcode').val(adr[2]);
+			$('#s-district').val(adr[0]);
+			$('#s-province').val(adr[1]);
+			$('#s-postcode').val(adr[2]);
+			$('#s-phone').focus();
 		}
 	}
 });
 
 
-$('#province').autocomplete({
+$('#s-province').autocomplete({
 	source:BASE_URL + 'auto_complete/province',
 	autoFocus:true,
 	open:function(event){
 		var $ul = $(this).autocomplete('widget');
 		$ul.css('width', 'auto');
+	},
+	close:function() {
+		let adr = $(this).val().trim();
+		if(adr.length) {
+			$(this).val(adr);
+			$('#s-phone').focus();
+		}
 	}
 })
 
 
-
-$('#postcode').autocomplete({
+$('#s-postcode').autocomplete({
 	source:BASE_URL + 'auto_complete/postcode',
 	autoFocus:true,
 	open:function(event){
@@ -732,14 +712,14 @@ $('#postcode').autocomplete({
 		$ul.css('width', 'auto');
 	},
 	close:function(){
-		var rs = $.trim($(this).val());
-		var adr = rs.split('>>');
+		let adr = $(this).val().trim().split('>>');
 		if(adr.length == 4){
-			$('#sub_district').val(adr[0]);
-			$('#district').val(adr[1]);
-			$('#province').val(adr[2]);
-			$('#postcode').val(adr[3]);
-			$('#postcode').focus();
+			$('#s-sub-district').val(adr[0]);
+			$('#s-district').val(adr[1]);
+			$('#s-province').val(adr[2]);
+			$('#s-postcode').val(adr[3]);
+			$('#s-postcode').focus();
+			$('#s-phone').focus();
 		}
 	}
 })
@@ -750,22 +730,19 @@ function clearAddressField()
 	$("#id_address").val('');
 	$("#Fname").val('');
 	$("#address1").val('');
-	$('#sub_district').val('');
-	$('#district').val('');
-	$("#province").val('');
-	$("#postcode").val('');
-	$("#adr-phone").val('');
-	$("#email").val('');
-	$("#alias").val('');
+	$('#s-sub-district').val('');
+	$('#s-district').val('');
+	$("#s-province").val('');
+	$("#s-postcode").val('');
+	$("#s-phone").val('');
+	$("#s-email").val('');
+	$("#s-alias").val('');
 }
-
 
 
 if($('#btn').length) {
 	var clipboard = new Clipboard('#btn');
 }
-
-
 
 
 function Summary(){
@@ -783,7 +760,6 @@ function print_order(id)
 	var left = (wid - 900) /2;
 	window.open("controller/orderController.php?print_order&order_code="+id, "_blank", "width=900, height=1000, left="+left+", location=no, scrollbars=yes");
 }
-
 
 
 function getSummary()

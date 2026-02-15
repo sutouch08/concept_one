@@ -86,8 +86,9 @@ function finishPrepare(){
       var rs = $.trim(rs);
       if(rs == 'success'){
         swal({title: "Success", type:"success", timer: 1000});
-        setTimeout(function(){ goBack();}, 1200);
-      }else{
+        setTimeout(function(){ refresh();}, 1200);
+      }
+      else{
         beep();
         swal("Error!", rs, "error");
       }
@@ -233,7 +234,7 @@ var intv = setInterval(function(){
     },
     success:function(rs){
       var rs = $.trim(rs);
-      if(rs != 4){
+      if(rs != 4 && rs != 7){
         window.location.reload();
       }
     }
@@ -259,4 +260,37 @@ function removeBuffer(orderCode, pdCode, order_detail_id) {
       }
     }
   })
+}
+
+
+function confirmOrder(){
+  var order_code = $("#order_code").val();
+
+  load_in();
+
+  $.ajax({
+    url: BASE_URL + 'inventory/delivery_order/confirm_order',
+    type:'POST',
+    cache:'false',
+    data:{
+      'order_code' : order_code
+    },
+    success:function(rs) {
+      load_out();
+      var rs = $.trim(rs);
+      if( rs == 'success') {
+        swal({
+          title:'Success',
+          type:'success',
+          timer:1000
+        });
+
+        setTimeout(function() {
+          goBack();
+        },1200);
+      }else {
+        swal('Error!', rs, 'error');
+      }
+    }
+  });
 }

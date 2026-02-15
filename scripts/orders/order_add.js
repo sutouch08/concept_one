@@ -713,7 +713,7 @@ function get_bill_to_address(code) {
 								render(source, ds.address, output);
 
 								$('#billToModal').modal('show');
-							}              
+							}
             }
             else {
               $('#customer_ref').val('');
@@ -1865,7 +1865,7 @@ function addCustomer() {
 		'branch_code' : $.trim($('#form-branch-code').val()),
 		'branch_name' : $.trim($('#form-branch-name').val()),
 		'address' : $.trim($('#form-address').val()),
-		'sub_district' : $.trim($('#form-subDistrict').val()),
+		'subDistrict' : $.trim($('#form-subDistrict').val()),
 		'district' : $.trim($('#form-district').val()),
 		'province' : $.trim($('#form-province').val()),
 		'postcode' : $.trim($('#form-postcode').val()),
@@ -1923,7 +1923,7 @@ function addCustomer() {
 					$('#branch-code').val(h.branch_code);
 					$('#branch-name').val(h.branch_name);
 					$('#address').val(h.address);
-					$('#sub-district').val(h.sub_district);
+					$('#sub-district').val(h.subDistrict);
 					$('#district').val(h.district);
 					$('#province').val(h.province);
 					$('#postcode').val(h.postcode);

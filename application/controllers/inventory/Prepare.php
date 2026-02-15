@@ -166,7 +166,8 @@ class Prepare extends PS_Controller
     $ds = array(
       'order' => $order,
       'uncomplete_details' => $uncomplete,
-      'complete_details' => $complete
+      'complete_details' => $complete,
+      'default_zone' => $order->warehouse_code.'-SYSTEM-BiN-LOCATION'
     );
 
     $this->load->view('inventory/prepare/prepare_process', $ds);
