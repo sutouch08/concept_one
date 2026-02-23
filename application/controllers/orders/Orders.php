@@ -1645,7 +1645,14 @@ class Orders extends PS_Controller
 
         if($sc === TRUE)
         {
-          if(! $this->orders_model->update($code, ['status' => 1]))
+          $totalBalance = $order->doc_total - $order->paidAmount;
+
+          $arr = array(
+            'status' => 1,
+            'TotalBalance' => $totalBalance < 0 ? 0 : $totalBalance
+          );
+
+          if(! $this->orders_model->update($code, $arr))
           {
             $sc = FALSE;
             $this->error = 'บันทึกออเดอร์ไม่สำเร็จ';

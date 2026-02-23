@@ -16,7 +16,7 @@
   <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 padding-5">
     	<p class="pull-right top-p text-right" >
 				<button type="button" class="btn btn-xs btn-warning top-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-				<?php if($order->is_term == 0 && $order->status == 1 && $order->TotalBalance > 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
+				<?php if($order->is_term == 0 && $order->status == 1  && $order->TotalBalance > 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
 				<button type="button" class="btn btn-xs btn-info top-btn" onclick="payOrder()">แจ้งชำระเงิน</button>
 				<?php endif; ?>
 				<?php if($this->pm->can_add OR $this->pm->can_edit) : ?>
