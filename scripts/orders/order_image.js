@@ -79,7 +79,7 @@ function removeImage(id_img) {
 }
 
 
-//function viewImage(imageUrl) {
+function viewImage(imageUrl) {
 	var image = '<img src="'+imageUrl+'" width="100%" />';
 	$("#imageBody").html(image);
 	$("#imageModal").modal('show');
