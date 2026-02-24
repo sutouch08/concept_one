@@ -68,7 +68,7 @@ class Order_payment extends PS_Controller
 
     if( ! empty($detail))
     {
-      $img = payment_image_url($detail->order_code);
+      $img = payment_image_url($detail->img);
 
       $bank   = $this->bank_model->get_account_detail($detail->id_account);
 
