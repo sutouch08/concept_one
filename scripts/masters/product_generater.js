@@ -99,7 +99,7 @@ function genColorAndSize(code, name){
     $('.size').each(function() {
       let size = $(this).val();
       let itemCode = code + '-' + color + '-' + size;
-      let itemName = name + ' สี'+colorName + ' ไซส์ '+size;
+      let itemName = name + ' '+colorName + ' '+size;
 
       addItemRow(itemCode, color, size, itemName, colorId, no);
       no++;
@@ -115,7 +115,7 @@ function genColorOnly(style, name) {
     let colorId = $(this).data('id');
     let colorName = $(this).data('name');
     let itemCode = style + '-' + color;
-    let itemName = name + ' สี'+colorName;
+    let itemName = name + ' '+colorName;
     addItemRow(itemCode, color, '', itemName, colorId, no);
     no++;
   });
@@ -128,7 +128,7 @@ function genSizeOnly(style, name){
   $('.size').each(function(){
     let size = $(this).val();
     let itemCode = style + '-' + size;
-    let itemName = name + ' ไซส์ '+size;
+    let itemName = name + ' '+size;
     addItemRow(itemCode, '', size, itemName, '', no);
     no++;
   })
@@ -237,7 +237,7 @@ function genItems() {
    h.items.push(item);
  });
 
- 
+
  if(h.items.length == 0) {
    swal({
      title:'Error!',
