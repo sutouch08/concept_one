@@ -741,7 +741,7 @@ class Order_pos extends PS_Controller
       $rows = $this->order_pos_return_model->count_rows($filter);
       $filter['orders'] = $this->order_pos_return_model->get_list($filter, $perpage, $this->uri->segment($this->segment));
       $filter['pos'] = $this->pos_model->get_pos_by_device_id($device_id);
-      $init = pagination_config($this->home.'/bill_list/', $rows, $perpage, $this->segment);
+      $init = pagination_config($this->home.'/return_list/'.$shop_id.'/'.$device_id, $rows, $perpage, $this->segment);
       $this->pagination->initialize($init);
       $this->load->view('order_pos/return_list', $filter);
     }
