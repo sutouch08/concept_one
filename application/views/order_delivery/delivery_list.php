@@ -1,4 +1,10 @@
 <?php $this->load->view('include/header'); ?>
+<style>
+	.tableFixHead thead tr th {
+		font-size: 11px;
+		padding:3px;
+	}
+</style>
 <div class="row">
 	<div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 padding-5">
     <h4 class="title">
@@ -52,6 +58,7 @@
 				<option value="all">ทั้งหมด</option>
 				<option value="0" <?php echo is_selected('0', $is_term); ?>>ขายสด</option>
 				<option value="1" <?php echo is_selected('1', $is_term); ?>>ขายเชื่อ</option>
+				<option value="2" <?php echo is_selected('2', $is_term); ?>>อภินันท์</option>
 			</select>
 		</div>
 
@@ -120,7 +127,7 @@
 <?php echo $this->pagination->create_links(); ?>
 <div class="row">
 	<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 padding-5 table-responsive" id="bill-div">
-		<table class="table tableFixHead border-1" style="font-size:12px; min-width:1470px; border-collapse:inherit;">
+		<table class="table tableFixHead border-1" style="font-size:11px; min-width:1520px; border-collapse:inherit;">
 			<thead>
 				<tr>
 					<th class="fix-width-40 middle text-center fix-header">
@@ -135,7 +142,7 @@
 					<th class="fix-width-100 middle fix-header">เลขที่เอกสาร</th>
 					<th class="fix-width-60 middle text-center fix-header">สถานะ</th>
 					<th class="fix-width-100 middle fix-header">ใบกำกับ</th>
-					<th class="fix-width-100 middle fix-header">เลขที่อ้างอิง</th>
+					<th class="fix-width-150 middle fix-header">เลขที่อ้างอิง</th>
 					<th class="fix-width-80 middle text-center fix-header">เล่มเอกสาร</th>
 					<th class="fix-width-100 middle fix-header">รหัสลูกค้า</th>
 					<th class="fix-width-250 middle fix-header">ลูกค้า</th>
@@ -168,7 +175,9 @@
 							<td class="middle text-center pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo empty($rs->invoice_code) ? 'Open' : 'Closed'; ?></td>
 							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->invoice_code; ?></td>
 							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->reference; ?></td>
-							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->is_term == 1 ? 'ขายเชื่อ' : 'ขายสด'; ?></td>
+							<td class="middle pointer text-center" ondblclick="viewDetail('<?php echo $rs->code; ?>')">
+								<?php echo $rs->role == 'U' ? 'อภินันท์' : ($rs->is_term == 1 ? 'ขายเชื่อ' : 'ขายสด'); ?>								
+							</td>
 							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->customer_code; ?></td>
 							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->customer_name; ?></td>
 							<td class="middle pointer" ondblclick="viewDetail('<?php echo $rs->code; ?>')"><?php echo $rs->customer_ref; ?></td>

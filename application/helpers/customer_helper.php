@@ -1,5 +1,5 @@
 <?php
-function select_GroupCode($code = '')
+function select_GroupCode($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -10,7 +10,7 @@ function select_GroupCode($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
 
@@ -19,7 +19,7 @@ function select_GroupCode($code = '')
 
 
 
-function select_GroupNum($code = '')
+function select_GroupNum($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -30,7 +30,7 @@ function select_GroupNum($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
 
@@ -39,7 +39,7 @@ function select_GroupNum($code = '')
 
 
 
-function select_DebPayAcct($code = '')
+function select_DebPayAcct($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -50,7 +50,7 @@ function select_DebPayAcct($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->code.' => '.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->code.' => '.$rs->name.'</option>';
     }
   }
 
@@ -59,7 +59,7 @@ function select_DebPayAcct($code = '')
 
 
 
-function select_sale($code='')
+function select_sale($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -70,14 +70,14 @@ function select_sale($code='')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
 
   return $sc;
 }
 
-function select_customer_group($code = '')
+function select_customer_group($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -88,7 +88,7 @@ function select_customer_group($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
 
@@ -97,7 +97,7 @@ function select_customer_group($code = '')
 }
 
 
-function select_customer_kind($code = '')
+function select_customer_kind($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -108,7 +108,7 @@ function select_customer_kind($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
   return $sc;
@@ -116,7 +116,7 @@ function select_customer_kind($code = '')
 
 
 
-function select_customer_type($code = '')
+function select_customer_type($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -127,7 +127,7 @@ function select_customer_type($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
   return $sc;
@@ -135,7 +135,7 @@ function select_customer_type($code = '')
 
 
 
-function select_customer_class($code = '')
+function select_customer_class($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -146,7 +146,7 @@ function select_customer_class($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
   return $sc;
@@ -154,7 +154,7 @@ function select_customer_class($code = '')
 
 
 
-function select_customer_area($code = '')
+function select_customer_area($code = NULL)
 {
   $sc = '';
   $CI =& get_instance();
@@ -165,7 +165,7 @@ function select_customer_area($code = '')
   {
     foreach($options as $rs)
     {
-      $sc .= '<option value="'.$rs->code.'" '.is_selected($code, $rs->code).'>'.$rs->name.'</option>';
+      $sc .= '<option value="'.$rs->code.'" '.is_selected(strval($code), strval($rs->code)).'>'.$rs->name.'</option>';
     }
   }
   return $sc;

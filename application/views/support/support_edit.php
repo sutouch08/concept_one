@@ -1,89 +1,132 @@
 <?php $this->load->view('include/header'); ?>
-<?php $isAdmin = (get_cookie('id_profile') == -987654321 ? TRUE : FALSE); ?>
+<?php $isAdmin = $this->_SuperAdmin; ?>
+<script src="<?php echo base_url(); ?>assets/js/dropzone.js"></script>
+<script src="<?php echo base_url(); ?>assets/js/jquery.colorbox.js"></script>
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/dropzone.css" />
+<link rel="stylesheet" href="<?php echo base_url(); ?>assets/css/colorbox.css" />
+<?php $this->load->view('orders/style'); ?>
+
 <div class="row">
-	<div class="col-lg-3 col-md-3 col-sm-3 hidden-xs padding-5">
-    <h3 class="title"><?php echo $this->title; ?></h3>
+  <div class="col-lg-2 col-md-2 col-sm-2 padding-5 hidden-xs">
+    <h3 class="title" style="margin-top:6px;"><?php echo $this->title; ?></h3>
   </div>
-	<div class="col-xs-12 padding-5 visible-xs">
-		<h3 class="title-xs"><?php echo $this->title; ?> </h3>
-	</div>
-  <div class="col-sm-9 col-xs-12 padding-5">
-  	<p class="pull-right" style="margin-bottom:1px;">
-			<?php if(empty($approve_view)) : ?>
-			<button type="button" class="btn btn-xs btn-warning top-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
-			<button type="button" class="btn btn-xs btn-default top-btn" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
-			<?php endif; ?>
-
-		<?php if(empty($approve_view)) : ?>
-			<?php if($order->state < 4 && $isAdmin && $order->never_expire == 0) : ?>
-			<button type="button" class="btn btn-xs btn-primary top-btn" onclick="setNotExpire(1)">ยกเว้นการหมดอายุ</button>
-			<?php endif; ?>
-			<?php if($order->state < 4 && $isAdmin && $order->never_expire == 1) : ?>
-				<button type="button" class="btn btn-xs btn-info top-btn" onclick="setNotExpire(0)">ไม่ยกเว้นการหมดอายุ</button>
-			<?php endif; ?>
-			<?php if($isAdmin && $order->is_expired == 1) : ?>
-				<button type="button" class="btn btn-xs btn-warning top-btn" onclick="unExpired()">ทำให้ไม่หมดอายุ</button>
-			<?php endif; ?>
-
-			<?php if($order->state == 1 && $order->is_expired == 0 && ($this->pm->can_add OR $this->pm->can_edit)) : ?>
-				<button type="button" class="btn btn-xs btn-yellow top-btn" onclick="editDetail()"><i class="fa fa-pencil"></i> แก้ไขรายการ</button>
-			<?php endif; ?>
-
-			<?php if($order->status == 0) : ?>
-				<button type="button" class="btn btn-xs btn-success top-btn" onclick="saveOrder()"><i class="fa fa-save"></i> บันทึก</button>
-			<?php endif; ?>
-		<?php endif; ?>
-
-			<?php if($order->state == 1 && $order->is_approved == 0 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
-					<button type="button" class="btn btn-xs btn-success top-btn" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
-			<?php endif; ?>
-			<?php if($order->state == 1 && $order->is_approved == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
-					<button type="button" class="btn btn-xs btn-danger top-btn" onclick="unapprove()"><i class="fa fa-refresh"></i> ไม่อนุมัติ</button>
-			<?php endif; ?>			
+  <div class="col-xs-12 padding-5 text-center visible-xs" style="background-color:#eee;">
+    <h3 class="margin-top-0"><?php echo $this->title; ?></h3>
+  </div>
+  <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 padding-5">
+    <p class="pull-right top-p text-right">
+      <button type="button" class="btn btn-xs btn-warning top-btn" onclick="goBack()"><i class="fa fa-arrow-left"></i> กลับ</button>
+      <button type="button" class="btn btn-xs btn-success top-btn" onclick="showCustomerModal()">ข้อมูลลูกค้า</button>
+      <button type="button" class="btn btn-xs btn-default top-btn hidden-xs" onclick="printOrderSheet()"><i class="fa fa-print"></i> พิมพ์</button>
+      <button type="button" class="btn btn-xs btn-info top-btn hidden-xs" onclick="printOrderSheetBarcode()"><i class="fa fa-barcode"></i> พิมพ์</button>
+      <?php if ($order->state == 1 && $order->status == 1 && $order->is_approved == 0 && $this->pm->can_approve) : ?>
+        <button type="button" class="btn btn-xs btn-success top-btn" id="btn-approve" onclick="approve()"><i class="fa fa-check"></i> อนุมัติ</button>
+      <?php endif; ?>      
+      <?php if ($order->state == 1 && $order->is_approved == 1 && $order->status == 1 && $order->is_expired == 0 && $this->pm->can_approve) : ?>
+        <button type="button" class="btn btn-xs btn-danger top-btn" onclick="unapprove()"><i class="fa fa-refresh"></i> ไม่อนุมัติ</button>
+      <?php endif; ?>
     </p>
   </div>
 </div><!-- End Row -->
-<hr class="padding-5"/>
-<input type="hidden" id="order_code" value="<?php echo $order->code; ?>" />
+<hr />
 <?php $this->load->view('support/support_edit_header'); ?>
-<?php if(empty($approve_view)) : ?>
 <?php $this->load->view('orders/order_panel'); ?>
-<?php $this->load->view('support/support_discount_bar'); ?>
-<?php $this->load->view('orders/order_online_modal'); ?>
-<?php else : ?>
-	<input type="hidden" id="id_sender" value="<?php echo $order->id_sender; ?>"/>
-	<input type="hidden" id="id_address" value="<?php echo $order->id_address; ?>"/>
-<?php endif; ?>
 <?php $this->load->view('support/support_detail'); ?>
+<?php $this->load->view('orders/order_online_modal'); ?>
+<?php $this->load->view('orders/order_grid_modal'); ?>
+<?php $this->load->view('order_invoice/customer_modal'); ?>
+<?php $this->load->view('order_invoice/address_modal'); ?>
+
+<div class="modal fade" id="soGrid" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="width:950px; max-width:95vw;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <center style="margin-bottom:10px;">
+          <h4 class="modal-title" id="so-title"></h4>
+        </center>
+      </div>
+      <div class="modal-body" style="max-width:94vw; min-height:300px; max-height:70vh; overflow:auto;">
+        <table class="table table-striped table-bordered" style="font-size:11px; table-layout: fixed; min-width:900px;">
+          <thead>
+            <th class="fix-width-40 text-center">#</th>
+            <th class="fix-width-150 text-center">Item</th>
+            <th class="min-width-200 text-center">Description</th>
+            <th class="fix-width-80 text-center">Sell Price</th>
+            <th class="fix-width-80 text-center">Qty</th>
+            <th class="fix-width-80 text-center">Open</th>
+            <th class="fix-width-80 text-center">Commited</th>
+            <th class="fix-width-80 text-center">Available</th>
+            <th class="fix-width-100 text-center">Order</th>
+          </thead>
+          <tbody id="so-table">
+
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default top-btn" data-dismiss="modal">ยกเลิก</button>
+        <button type="button" class="btn btn-yellow top-btn" onclick="takeAll()">เลือกทั้งหมด</button>
+        <button type="button" class="btn btn-purple top-btn" onclick="clearAll()">เคลียร์ทั้งหมด</button>
+        <button type="button" class="btn btn-primary top-btn" id="btn-add-so" onclick="addSoItem()">สร้างออเดอร์</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
-<?php if(!empty($approve_logs)) : ?>
-	<div class="row">
-		<?php foreach($approve_logs as $logs) : ?>
-		<div class="col-sm-12 text-right padding-5 first last">
-			<?php if($logs->approve == 1) : ?>
-			  <span class="green">
-					อนุมัติโดย :
-					<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
-				</span>
-			<?php else : ?>
-				<span class="red">
-				ยกเลิกโดย :
-				<?php echo $logs->approver; ?> @ <?php echo thai_date($logs->date_upd, TRUE); ?>
-			  </span>
-			<?php endif; ?>
+<script id="so-template" type="text/x-handlebarsTemplate">
+  {{#each this}}
+    <tr id="row-{{id}}">
+      <td class="middle text-center">{{no}}</td>
+      <td class="middle">{{product_code}}</td>
+      <td class="middle">{{product_name}}</td>
+      <td class="middle text-right">{{sell_price}}</td>
+      <td class="middle text-right">{{qty}}</td>
+      <td class="middle text-right">{{OpenQty}}</td>
+      <td class="middle text-right">{{commit_qty}}</td>
+      <td class="middle text-right">{{available}}</td>
+      <td class="middle text-right">
+        <input type="number" class="form-control input-sm text-right so-qty"
+          id="so-qty-{{id}}"
+          data-id="{{id}}"
+          data-code="{{product_code}}"
+          data-name="{{product_name}}"
+          data-style="{{style_code}}"
+          data-basecode="{{order_code}}"
+          data-baseline="{{id}}"
+          data-baseentry="{{id_order}}"
+          data-openqty="{{OpenQty}}"
+          data-qty="{{qty}}"
+          data-commit="{{commit_qty}}"
+          data-available="{{available}}"
+          data-cost="{{cost}}"
+          data-price="{{price}}"
+          data-sellprice="{{sell_price}}"
+          data-discprcnt="{{discount_label}}"
+          data-discamount="{{discount_amount}}"
+          data-avgbilldisc="{{avgBillDiscAmount}}"
+          data-vatcode="{{vat_code}}"
+          data-vatrate="{{vat_rate}}"
+          data-vattype="{{vat_type}}"
+          data-unit="{{unit_code}}"
+          data-iscount="{{is_count}}"
+          value="{{available}}" />
+      </td>
+    </tr>
+  {{/each}}
+</script>
 
-		</div>
-	<?php endforeach; ?>
-	</div>
-<?php endif; ?>
+<input type="hidden" id="auz" value="<?php echo getConfig('ALLOW_UNDER_ZERO'); ?>">
 
 
+<script src="<?php echo base_url(); ?>assets/js/clipboard.min.js"></script>
+<script src="<?php echo base_url(); ?>scripts/support/support.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/support/support_add.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_online.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/print/print_order.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/print/print_address.js?v=<?php echo date('YmdH'); ?>"></script>
+<script src="<?php echo base_url(); ?>scripts/orders/order_grid.js?v=<?php echo date('YmdH'); ?>"></script>
 
-<script src="<?php echo base_url(); ?>scripts/support/support.js?v=<?php echo date('Ymd'); ?>"></script>
-<script src="<?php echo base_url(); ?>scripts/support/support_add.js?v=<?php echo date('Ymd'); ?>"></script>
-<script src="<?php echo base_url(); ?>scripts/print/print_order.js?v=<?php echo date('Ymd'); ?>"></script>
-<script src="<?php echo base_url(); ?>scripts/print/print_address.js?v=<?php echo date('Ymd'); ?>"></script>
-<script src="<?php echo base_url(); ?>scripts/orders/order_online.js?v=<?php echo date('Ymd'); ?>"></script>
 
 <?php $this->load->view('include/footer'); ?>

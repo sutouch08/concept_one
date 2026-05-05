@@ -10,6 +10,11 @@ window.addEventListener('load', () => {
 });
 
 
+document.querySelectorAll('input[type="number"]').forEach(input => {
+	// ปิด wheel
+	input.addEventListener('wheel', e => e.preventDefault(), { passive: false });
+});
+
 function get_uuid() {
 	return localStorage.getItem('ix_uuid');
 }

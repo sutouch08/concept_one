@@ -72,7 +72,8 @@ function approve()
     success:function(rs){
       if(rs === 'success'){
         change_state();
-      }else{
+      }
+      else{
 				load_out();
 
         swal({

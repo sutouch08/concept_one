@@ -1,7 +1,6 @@
 <?php if($order->is_term == 0) : ?>
 <div class="row">
-  <div class="col-sm-12">
-    <?php print_r($payments); ?>
+  <div class="col-sm-12">    
   <?php echo paymentLabel($payments); // paymentLabel($order->code, paymentExists($order->code), $order->is_paid); ?>
   </div>
 </div>

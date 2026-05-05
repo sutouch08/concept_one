@@ -369,7 +369,7 @@ class Export
           'DpmDrawn' => $dpmDrawn,
           'U_SONO' => $order->so_code,
           'U_ECOMNO' => $order->code,
-          'U_BOOKCODE' => $order->bookcode,
+          'U_BOOKCODE' => $order->U_BOOKCODE,
           'F_E_Commerce' => $option,
           'F_E_CommerceDate' => sap_date(now(), TRUE),
           'F_Sap' => NULL,

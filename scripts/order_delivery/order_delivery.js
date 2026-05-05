@@ -330,6 +330,7 @@ function createTaxInvoice() {
     'refType' : $('#ref-type').val(),
 		'vat_type' : $('#vat-type').val(),
 		'is_term' : $('#is-term').val(),
+		'payment_role' : 5, // credit
 		'taxStatus' : 'Y',
 		'date_add' : $('#date').val(),
 		'customer_code' : $('#customer-code').val(),
@@ -480,6 +481,7 @@ function createInvoice() {
     'refType' : $('#ref-type').val(),
 		'vat_type' : $('#vat-type').val(),
 		'is_term' : $('#is-term').val(),
+		'payment_role' : 5, // credit
 		'taxStatus' : 'N',
 		'date_add' : $('#date').val(),
 		'customer_code' : $('#customer-code').val(),

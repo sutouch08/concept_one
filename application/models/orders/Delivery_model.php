@@ -39,10 +39,9 @@ class Delivery_model extends CI_Model
 
   public function count_rows(array $ds = array())
   {
-    $this->db
-    ->where('isNew', 1)
+    $this->db    
     ->where('state', 8)
-    ->where_in('role', ['S', 'U', 'P', 'C']);
+    ->where_in('role', ['S', 'U']);
 
     if( ! empty($ds['code']))
     {
@@ -86,9 +85,16 @@ class Delivery_model extends CI_Model
       $this->db->where('warehouse_code', $ds['warehouse']);
     }
 
-    if( isset($ds['is_term']) && $ds['is_term'] != 'all')
+    if (isset($ds['is_term']) && $ds['is_term'] != 'all')
     {
-      $this->db->where('is_term', $ds['is_term']);
+      if ($ds['is_term'] == 2)
+      {
+        $this->db->where('is_term', 1)->where('role', 'U');
+      }
+      else
+      {
+        $this->db->where('is_term', $ds['is_term']);
+      }
     }
 
     if( isset($ds['tax_status']) && $ds['tax_status'] != 'all')
@@ -136,10 +142,9 @@ class Delivery_model extends CI_Model
 
   public function get_list(array $ds = array(), $perpage = 20, $offset = 0)
   {
-    $this->db
-    ->where('isNew', 1)
+    $this->db    
     ->where('state', 8)
-    ->where_in('role', ['S', 'U', 'P', 'C']);
+    ->where_in('role', ['S', 'U']);
 
     if( ! empty($ds['code']))
     {
@@ -185,7 +190,14 @@ class Delivery_model extends CI_Model
 
     if( isset($ds['is_term']) && $ds['is_term'] != 'all')
     {
-      $this->db->where('is_term', $ds['is_term']);
+      if($ds['is_term'] == 2)
+      {
+        $this->db->where('is_term', 1)->where('role', 'U');
+      }
+      else
+      {
+        $this->db->where('is_term', $ds['is_term']);
+      }      
     }
 
     if( isset($ds['tax_status']) && $ds['tax_status'] != 'all')

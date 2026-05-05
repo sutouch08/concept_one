@@ -51,7 +51,7 @@
  	 <div class="col-xs-12 col-sm-4">
  		 <select name="GroupCode" id="GroupCode" class="form-control" required>
  			 <?php echo select_GroupCode($ds->GroupCode); ?>
- 		 </select>
+ 		 </select>		 
  	 </div>
   </div>
 

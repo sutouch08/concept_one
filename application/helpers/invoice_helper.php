@@ -12,8 +12,8 @@ function bookcode_name($bookcode)
     case 'T' :
       $name = 'เงินเชื่อ';
       break;
-    case 'P' :
-      $name = 'POS';
+    case 'U' :
+      $name = 'อภินันท์';
       break;
   }
 

@@ -982,14 +982,14 @@ class Order_invoice extends PS_Controller
             {
               $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
               $bookcode = $pre->bookcode;
+              $U_BOOKCODE = $pre->U_BOOKCODE;
 
               if( ! empty($code))
-              {
-                $so = empty($order->so_code) ? NULL : $this->sales_order_model->get($order->so_code);
-
+              {                
                 $arr = array(
                   'code' => $code,
                   'bookcode' => $bookcode,
+                  'U_BOOKCODE' => $U_BOOKCODE,
                   'is_term' => $ds->is_term,
                   'vat_type' => $ds->vat_type,
                   'TaxStatus' => $ds->taxStatus,
@@ -1259,14 +1259,14 @@ class Order_invoice extends PS_Controller
           {
             $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
             $bookcode = $pre->bookcode;
+            $U_BOOKCODE = $pre->U_BOOKCODE;
 
             if( ! empty($code))
-            {
-              $so = empty($order->so_code) ? NULL : $this->sales_order_model->get($order->so_code);
-
+            {              
               $arr = array(
                 'code' => $code,
                 'bookcode' => $bookcode,
+                'U_BOOKCODE' => $U_BOOKCODE,
                 'is_term' => $ds->is_term,
                 'vat_type' => $ds->vat_type,
                 'TaxStatus' => $ds->taxStatus,
@@ -1616,6 +1616,7 @@ class Order_invoice extends PS_Controller
             {
               $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
               $bookcode = $pre->bookcode;
+              $U_BOOKCODE = $pre->U_BOOKCODE;
 
               if( ! empty($code))
               {
@@ -1624,6 +1625,7 @@ class Order_invoice extends PS_Controller
                 $arr = array(
                   'code' => $code,
                   'bookcode' => $bookcode,
+                  'U_BOOKCODE' => $U_BOOKCODE,
                   'is_term' => $is_term,
                   'vat_type' => $order->vat_type,
                   'TaxStatus' => $taxStatus,
@@ -1926,7 +1928,7 @@ class Order_invoice extends PS_Controller
 
           $order->billCode = $order->code;
           $order->taxStatus = 'N';
-          $order->refType = $order->role == 'S' ? 'WO' : ($order->role == 'U' ? 'WU' : ($order->role == 'C' ? 'WC' : 'WS'));
+          $order->refType = $order->role == 'U' ? 'WU' : 'WO';
           $order->date_add = now();
           $order->is_company = $order->isCompany;
           $order->billDiscPrcnt = $order->bDiscText;
@@ -2107,20 +2109,20 @@ class Order_invoice extends PS_Controller
 
           $doc_date = db_date($ds->date_add);
 
-          $pre = $this->getInvoicePrefixData('ORDER', is_true($ds->is_term), $ds->taxStatus);
+          $pre = $this->getInvoicePrefixData('WU', is_true($ds->is_term), $ds->taxStatus);
 
           if( ! empty($pre))
           {
             $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
             $bookcode = $pre->bookcode;
+            $U_BOOKCODE = $pre->U_BOOKCODE;
 
             if( ! empty($code))
-            {
-              $so = empty($order->so_code) ? NULL : $this->sales_order_model->get($order->so_code);
-
+            {              
               $arr = array(
                 'code' => $code,
                 'bookcode' => $bookcode,
+                'U_BOOKCODE' => $U_BOOKCODE,
                 'is_term' => $ds->is_term,
                 'vat_type' => $ds->vat_type,
                 'TaxStatus' => $ds->taxStatus,
@@ -2850,15 +2852,15 @@ class Order_invoice extends PS_Controller
       {
         switch($order->bookcode)
         {
-          case 'P' :
-            $option = $order->TaxStatus == 'Y' ? 'DRTI' : 'DRO';
+          case 'U' : //-- อภินันท์
+             $option = $order->TaxStatus == 'Y' ? 'DTI' : 'DO';
           break;
-          case 'C' :
-            $option = $order->TaxStatus == 'Y' ? 'DRTI' : 'DRO';
-          break;
-          case 'T' :
-            $option = $order->TaxStatus == 'Y' ? 'DITI' : 'DIO';
-          break;
+          case 'C' : //-- เงินสด
+             $option = $order->TaxStatus == 'Y' ? 'DRTI' : 'DRO';
+          break;          
+          case 'T' : //-- เงินเชื่อ
+              $option = $order->TaxStatus == 'Y' ? 'DITI' : 'DIO';
+          break;                  
         }
       }
 
@@ -2968,22 +2970,31 @@ class Order_invoice extends PS_Controller
 
     switch($type)
     {
+      case 'WU' :
+        $ds->prefix = $tax_status == 'Y' ? getConfig('PREFIX_SUPPORT_TAX_INVOICE') : getConfig('PREFIX_SUPPORT_INVOICE');
+        $ds->bookcode = 'U';
+        $ds->U_BOOKCODE = $tax_status == 'Y' ? 'IVPM' : 'IVPN';
+        $ds->running = $tax_status == 'Y' ? getConfig('RUN_DIGIT_SUPPORT_TAX_INVOICE') : getConfig('RUN_DIGIT_SUPPORT_INVOICE');
+      break;
       case 'POS' :
-        $ds->prefix = $tax_status == 'Y' ? getConfig('PREFIX_POS_TAX_INVOICE') : getConfig('PREFIX_POS_INVOICE');
-        $ds->bookcode = 'P';
-        $ds->running = $tax_status == 'Y' ? getConfig('RUN_DIGIT_POS_TAX_INVOICE') : getConfig('RUN_DIGIT_POS_INVOICE');
+        $ds->prefix = $tax_status == 'Y' ? getConfig('PREFIX_CASH_TAX_INVOICE') : getConfig('PREFIX_CASH_INVOICE');
+        $ds->bookcode = 'C';
+        $ds->U_BOOKCODE = $tax_status == 'Y' ? 'IVCS' : 'IVCN';
+        $ds->running = $tax_status == 'Y' ? getConfig('RUN_DIGIT_CASH_TAX_INVOICE') : getConfig('RUN_DIGIT_CASH_INVOICE');
       break;
       case 'ORDER' :
         if($is_term)
         {
           $ds->prefix = $tax_status == 'Y' ? getConfig('PREFIX_TERM_TAX_INVOICE') : getConfig('PREFIX_TERM_INVOICE');
           $ds->bookcode = 'T';
+           $ds->U_BOOKCODE = $tax_status == 'Y' ? 'IVMP' : 'IVMN';
           $ds->running = $tax_status == 'Y' ? getConfig('RUN_DIGIT_TERM_TAX_INVOICE') : getConfig('RUN_DIGIT_TERM_INVOICE');
         }
         else
         {
           $ds->prefix = $tax_status == 'Y' ? getConfig('PREFIX_CASH_TAX_INVOICE') : getConfig('PREFIX_CASH_INVOICE');
           $ds->bookcode = 'C';
+          $ds->U_BOOKCODE = $tax_status == 'Y' ? 'IVCS' : 'IVCN';
           $ds->running = $tax_status == 'Y' ? getConfig('RUN_DIGIT_CASH_TAX_INVOICE') : getConfig('RUN_DIGIT_CASH_INVOICE');
         }
       break;

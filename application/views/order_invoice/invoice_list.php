@@ -66,10 +66,10 @@
 	<div class="col-lg-1 col-md-1-harf col-sm-1-harf col-xs-6 padding-5">
     <label>เล่มเอกสาร</label>
 		<select class="form-control input-sm filter" name="bookcode">
-			<option value="all">ทั้งหมด</option>
+			<option value="all">ทั้งหมด</option>			
 			<option value="C" <?php echo is_selected('C', $bookcode); ?>>เงินสด</option>
 			<option value="T" <?php echo is_selected('T', $bookcode); ?>>เงินเชื่อ</option>
-			<option value="P" <?php echo is_selected('P', $bookcode); ?>>POS</option>
+			<option value="U" <?php echo is_selected('U', $bookcode); ?>>อภินันท์</option>
 		</select>
   </div>
 

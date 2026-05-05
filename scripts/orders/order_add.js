@@ -53,7 +53,7 @@ function add() {
     'customer_ref' : $.trim($('#customer_ref').val()),
     'phone' : $('#phone').val(),
     'tax_id' : $('#tax-id').val(),
-    'isCompany' : $('is-company').is(':checked') ? 1 : 0,
+    'isCompany' : $('#is-company').is(':checked') ? 1 : 0,
     'branch_code' : $('#branch-code').val(),
     'branch_name' : $('#branch-name').val(),
     'address' : $('#address').val(),
@@ -1212,7 +1212,7 @@ function recalDiscount(){
 }
 
 
-function updateItem(id) {
+async function updateItem(id) {
   let code = $('#order_code').val();
 	let qty = parseDefault(parseFloat($('#qty-'+id).val()), 1.00);
 	let price = parseDefault(parseFloat($('#price-'+id).val()), 0.00);
@@ -1229,8 +1229,8 @@ function updateItem(id) {
   if(price < 0) {
     price = price * (-1);
     $('#price-'+id).val(price.toFixed(2));
-    recalItem(id);
   }
+  await recalItem(id);
 
   let amountBfDisc = roundNumber(parseDefault(parseFloat(removeCommas($('#total-amount').val())), 0), 2);
   let billDiscPrcnt = roundNumber(parseDefault(parseFloat($('#bill-disc-percent').val()), 0), 2);
@@ -1293,7 +1293,7 @@ function updateItem(id) {
   }, 100);
 }
 
-function recalItem(id) {
+async function recalItem(id) {
 	var price = parseDefault(parseFloat($('#price-'+id).val()), 0);
 	var qty = parseDefault(parseFloat($('#qty-'+id).val()), 1.00);
 	var disc = parseDiscountAmount($('#disc-'+id).val(), price);
@@ -1305,7 +1305,7 @@ function recalItem(id) {
 	$('#sellPrice-'+id).val(sell_price);
 	$('#discAmount-'+id).val(discount_amount);
 
-	recalTotal();
+	await recalTotal();
 }
 
 
@@ -1364,8 +1364,9 @@ function recalTotal() {
 
   totalTaxAmount = roundNumber(totalTaxAmount, 2);
   docTotal = vatType == 'E' ? roundNumber(amountAfterDisc + totalTaxAmount, 2) : roundNumber(amountAfterDisc, 2);
-
 	whtAmount = vatType == 'E' ? roundNumber(amountAfterDisc * (whtPrcnt * 0.01)) : roundNumber((amountAfterDisc - totalTaxAmount) * (whtPrcnt * 0.01), 2);
+  let paidAmount = parseDefault(parseFloat(removeCommas($('#paid-amount').val())), 0.00);
+  let totalBalance = docTotal - paidAmount;
 
 	//--- update bill discount
 	$('#total-qty').val(addCommas(totalQty));
@@ -1377,6 +1378,7 @@ function recalTotal() {
 	$('#vat-total').val(totalTaxAmount);
 	$('#vat-total-label').val(addCommas(totalTaxAmount.toFixed(2)));
   $('#doc-total').val(addCommas(docTotal.toFixed(2)));
+  $('#total-balance').val(addCommas(totalBalance.toFixed(2)));
 }
 
 
@@ -1865,7 +1867,7 @@ function addCustomer() {
 		'branch_code' : $.trim($('#form-branch-code').val()),
 		'branch_name' : $.trim($('#form-branch-name').val()),
 		'address' : $.trim($('#form-address').val()),
-		'subDistrict' : $.trim($('#form-subDistrict').val()),
+		'sub_district' : $.trim($('#form-subDistrict').val()),
 		'district' : $.trim($('#form-district').val()),
 		'province' : $.trim($('#form-province').val()),
 		'postcode' : $.trim($('#form-postcode').val()),
@@ -1923,7 +1925,7 @@ function addCustomer() {
 					$('#branch-code').val(h.branch_code);
 					$('#branch-name').val(h.branch_name);
 					$('#address').val(h.address);
-					$('#sub-district').val(h.subDistrict);
+					$('#sub-district').val(h.sub_district);
 					$('#district').val(h.district);
 					$('#province').val(h.province);
 					$('#postcode').val(h.postcode);

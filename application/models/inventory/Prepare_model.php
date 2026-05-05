@@ -25,10 +25,11 @@ class Prepare_model extends CI_Model
 
   public function get_warehouse_code($zone_code)
   {
-    $rs = $this->ms->select('WhsCode')->where('BinCode', $zone_code)->get('OBIN');
+    $rs = $this->db->select('warehouse_code')->where('code', $zone_code)->get('zone');
+    
     if($rs->num_rows() === 1)
     {
-      return $rs->row()->WhsCode;
+      return $rs->row()->warehouse_code;
     }
 
     return  NULL;

@@ -98,6 +98,10 @@
 </div>
 <hr class="hidden-xs"/>
 <div class="row hidden-xs">
+	<div class="col-lg-1-harf col-md-2 col-sm-2 padding-5">
+		<label>ช่องทาง</label>
+		<input type="text" class="form-control input-sm text-center" id="channels" value="<?php echo $doc->role == 'U' ? 'เบิกอภินันท์' : channels_name($doc->channels_code); ?>" disabled />
+	</div>
   <div class="col-lg-1-harf col-md-2 col-sm-2 padding-5">
     <label>ใบสั่งขาย</label>
 		<div class="input-group">
@@ -373,9 +377,11 @@
 			<input type="hidden" id="down-payment-amount" value="<?php echo $downPaymentUse; ?>" />
 			<input type="hidden" id="wht-amount" value="<?php echo $doc->WhtAmount; ?>" />
 			<input type="hidden" id="pay-amount" value="<?php echo $payAmount; ?>" />
-			<?php $refType = $doc->role == 'S' ? 'WO' : ($doc->role == 'U' ? 'WU' : ($doc->role == 'C' ? 'WC' : 'WS')); ?>
+
+			<?php $refType = $doc->role == 'U' ? 'WU' : 'WO'; ?>
 
 			<input type="hidden" id="ref-type" value="<?php echo $refType; ?>" />
+
 		</div>
 	</div>
 </div>
