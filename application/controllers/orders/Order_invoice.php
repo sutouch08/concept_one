@@ -1585,6 +1585,397 @@ class Order_invoice extends PS_Controller
   }
 
 
+  private function add_by_wu($ds)
+  {
+    $sc = TRUE;
+    $ex = 0;
+    $order = $this->orders_model->get($ds->billCode);
+
+    if ($order->state == 8)
+    {
+      if (empty($order->invoice_code))
+      {
+        $details = $this->invoice_model->get_details($order->code); //--- รายการที่มีการบันทึกขายไป
+
+        if (! empty($details))
+        {
+          $VatSum = 0.00;
+          $DocTotal = 0.00;
+          $totalBefDisc = 0;
+          $DiscSum = 0.00;
+
+          $doc_date = db_date($ds->date_add);
+
+          $pre = $this->getInvoicePrefixData('WU', is_true($ds->is_term), $ds->taxStatus);
+
+          if (! empty($pre))
+          {
+            $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
+            $bookcode = $pre->bookcode;
+            $U_BOOKCODE = $pre->U_BOOKCODE;
+
+            if (! empty($code))
+            {
+              $arr = array(
+                'code' => $code,
+                'bookcode' => $bookcode,
+                'U_BOOKCODE' => $U_BOOKCODE,
+                'is_term' => $ds->is_term,
+                'vat_type' => $ds->vat_type,
+                'TaxStatus' => $ds->taxStatus,
+                'tax_id' => $ds->tax_id,
+                'DocDate' => $doc_date,
+                'DocDueDate' => $doc_date,
+                'TaxDate' => $doc_date,
+                'CardCode' => $ds->customer_code,
+                'CardName' => $ds->customer_name,
+                'isCompany' => $ds->is_company,
+                'branch_code' => $ds->branch_code,
+                'branch_name' => $ds->branch_name,
+                'NumAtCard' => $ds->customer_ref,
+                'address' => $ds->address,
+                'sub_district' => $ds->sub_district,
+                'district' => $ds->district,
+                'province' => $ds->province,
+                'postcode' => $ds->postcode,
+                'phone' => $ds->phone,
+                'DiscPrcnt' => $ds->billDiscPrcnt,
+                'DiscSum' => $ds->billDiscAmount,
+                'VatSum' => $ds->vatSum,
+                'DocTotal' => $ds->docTotal,
+                'BaseType' => $ds->refType,
+                'BaseRef' => $order->code,
+                'so_code' => $order->so_code,
+                'order_code' => $order->code,
+                'bill_code' => NULL,
+                'Comments' => get_null($ds->remark) . (! empty($order->so_code) ? "BaseOn Sales Order {$order->so_code}" : ""),
+                'WhsCode' => $order->warehouse_code,
+                'SlpCode' => $ds->sale_id,
+                'shipped_date' => now(),
+                'user' => $this->_user->uname,
+                'channels_code' => $order->channels_code,
+                'payment_role' => $ds->payment_role,
+                'isWht' => $ds->whtPrcnt > 0 ? 1 : 0,
+                'WhtPrcnt' => $ds->whtPrcnt,
+                'WhtAmount' => $ds->whtAmount,
+                'downPaymentAmount' => $ds->totalDownAmount
+              );
+
+              $this->db->trans_begin();
+
+              $id = $this->order_invoice_model->add($arr);
+
+              if ($id)
+              {
+                $lineNum = 0;
+
+                foreach ($details as $rs)
+                {
+                  if ($sc === FALSE)
+                  {
+                    break;
+                  }
+
+                  $LineTotal = $ds->vat_type == 'E' ? $rs->total_amount : remove_vat($rs->total_amount, $rs->VatRate);
+
+                  $arr = array(
+                    'bookcode' => $bookcode,
+                    'invoice_id' => $id,
+                    'invoice_code' => $code,
+                    'LineNum' => $lineNum,
+                    'BaseType' => $ds->refType,
+                    'BaseRef' => $rs->reference,
+                    'BaseLine' => $rs->order_detail_id,
+                    'so_line_id' => $rs->so_line_id,
+                    'ItemCode' => $rs->product_code,
+                    'Dscription' => $rs->product_name,
+                    'Qty' => $rs->qty,
+                    'Price' => $ds->vat_type == 'E' ? $rs->sell : remove_vat($rs->sell, $rs->VatRate), //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
+                    'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price),
+                    'PriceBefDi' => $ds->vat_type == 'E' ? $rs->price : remove_vat($rs->price, $rs->VatRate), //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
+                    'LineTotal' => $LineTotal,
+                    'VatType' => $ds->vat_type,
+                    'VatCode' => $rs->VatCode,
+                    'VatRate' => $rs->VatRate,
+                    'PriceAfVAT' => $ds->vat_type == 'E' ? add_vat($rs->sell, $rs->VatRate) : $rs->sell,
+                    'VatSum' => $rs->VatSum,
+                    'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
+                    'avgBillDiscAmount' => $rs->avgBillDiscAmount,
+                    'sumBillDiscAmount' => $rs->sumBillDiscAmount,
+                    'SlpCode' => $rs->sale_code,
+                    'WhsCode' => $rs->warehouse_code,
+                    'BinCode' => $rs->zone_code,
+                    'DocDate' => $doc_date,
+                    'shipped_date' => $doc_date,
+                    'LineText' => $rs->line_text,
+                    'is_count' => $rs->is_count
+                  );
+
+                  if ($this->order_invoice_model->add_detail($arr))
+                  {
+                    $totalBefDisc += $rs->total_amount;
+                    $VatSum += $rs->VatSum;
+                    $DiscSum += $rs->sumBillDiscAmount;
+                    $lineNum++;
+
+                    if (! $this->orders_model->update_detail($rs->order_detail_id, ['is_complete' => 1]))
+                    {
+                      $sc = FALSE;
+                      $this->error = "Failed to update Order line status";
+                    }
+
+                    //--- update so open qty
+                    if ($sc === TRUE && ! empty($rs->so_line_id))
+                    {
+                      $sol = $this->sales_order_model->get_detail($rs->so_line_id);
+
+                      if (! empty($sol))
+                      {
+                        if ($sol->line_status == 'O')
+                        {
+                          if ($sol->OpenQty > 0 && $sol->OpenQty >= $rs->qty)
+                          {
+                            $OpenQty = $sol->OpenQty - $rs->qty;
+
+                            $arr = array(
+                              'OpenQty' => $OpenQty,
+                              'line_status' => $OpenQty == 0 ? 'C' : 'O'
+                            );
+
+                            if (! $this->sales_order_model->update_detail($rs->so_line_id, $arr))
+                            {
+                              $sc = FALSE;
+                              $this->error = "Failed to update OpenQty On Line Id : {$rs->so_line_id}";
+                            }
+                          }
+                          else
+                          {
+                            $sc = FALSE;
+                            $this->error = "จำนวนที่เปิด invoice มากกว่าจำนวนคงค้างในใบสั่งขาย {$rs->so_code} : {$rs->product_code}";
+                          }
+                        }
+                        else
+                        {
+                          $sc = FALSE;
+                          $this->error = "สถานะรายการในใบสั่งขายถูกปิดไปแล้ว {$rs->so_code} : {$rs->product_code}";
+                        }
+                      }
+                      else
+                      {
+                        $sc = FALSE;
+                        $this->error = "ไม่พบรายการเชื่อมโยงในใบสั่งขาย {$rs->so_code} : {$rs->product_code}";
+                      }
+                    } //--- end if so_line_id
+                  }
+                  else
+                  {
+                    $sc = FALSE;
+                    $this->error = "Failed to insert invoice at line {$lineNum}";
+                  } //--- end if add_detail
+                } //--- end foreach
+
+                if ($sc === TRUE)
+                {
+                  $DocTotal = $totalBefDisc - $DiscSum;
+                  $DocTotal = $ds->vat_type == 'E' ? $DocTotal + $VatSum : $DocTotal;
+
+                  $arr = array(
+                    'DiscSum' => $DiscSum,
+                    'VatSum' => $VatSum,
+                    'DocTotal' => $DocTotal
+                  );
+
+                  if (empty($ds->downPaymentUse))
+                  {
+                    $dps = $this->order_down_payment_model->get_by_reference($order->code);
+
+                    if (! empty($dps))
+                    {
+                      $doc_total = $ds->vat_type == 'E' ? $DocTotal + $VatSum : $DocTotal;
+                      $downPaymentUse = array();
+                      $downPaymentAmount = 0;
+
+                      foreach ($dps as $dp)
+                      {
+                        if ($doc_total > 0)
+                        {
+                          if ($dp->available > 0)
+                          {
+                            $amount = $dp->available <= $doc_total ? $dp->available : $doc_total;
+                            $dpu = new stdClass();
+                            $dpu->id = $dp->id;
+                            $dpu->amount = $amount;
+
+                            $downPaymentUse[] = $dpu;
+
+                            $doc_total -= $amount;
+                            $downPaymentAmount += $amount;
+                          }
+                        }
+                      } //--- end foreach;
+
+                      $ds->downPaymentUse = $downPaymentUse;
+
+                      $arr['downPaymentAmount'] = $downPaymentAmount;
+                    }
+                  }
+
+
+                  if (! $this->order_invoice_model->update_by_id($id, $arr))
+                  {
+                    $sc = FALSE;
+                    $this->error = "Failed to update Invoice Summary";
+                  }
+                }
+
+                if ($sc === TRUE)
+                {
+                  if (! $this->orders_model->update($order->code, ['invoice_code' => $code]))
+                  {
+                    $sc = FALSE;
+                    $this->error = "Failed to update invoice code On Orders";
+                  }
+                }
+
+                if ($sc === TRUE && ! empty($order->so_code))
+                {
+                  //---- close so if all line closed
+                  $count = $this->sales_order_model->count_open_line($order->so_code);
+
+                  if ($count == 0)
+                  {
+                    $this->sales_order_model->update($order->so_code, ['status' => 'C']);
+                  }
+                }
+
+                if ($sc === TRUE)
+                {
+
+                  if (! empty($ds->downPaymentUse))
+                  {
+                    foreach ($ds->downPaymentUse as $rs)
+                    {
+                      if ($sc === FALSE)
+                      {
+                        break;
+                      }
+
+                      $dp = $this->order_down_payment_model->get_by_id($rs->id);
+
+                      if (! empty($dp))
+                      {
+                        if ($dp->status == 'O')
+                        {
+                          $used = $dp->used + $rs->amount;
+                          $available = $dp->amount - $used;
+                          $status = $available > 0 ? 'O' : 'C';
+
+                          $arr = array(
+                            'ref_code' => $code,
+                            'used' => $used,
+                            'available' => $available > 0 ? $available : 0,
+                            'status' => $status
+                          );
+
+
+                          if (! $this->order_down_payment_model->update($dp->id, $arr))
+                          {
+                            $sc = FALSE;
+                            $this->error = "ตัดยอดเงินมัดจำไม่สำเร็จ";
+                          }
+
+                          if ($sc === TRUE)
+                          {
+                            $arr = array(
+                              'down_payment_id' => $dp->id,
+                              'down_payment_code' => $dp->code,
+                              'TargetRef' => $order->code,
+                              'TargetType' => $ds->refType,
+                              'so_code' => $order->so_code,
+                              'order_code' => $order->code,
+                              'bill_code' => NULL,
+                              'invoice_code' => $code,
+                              'amount' => $rs->amount,
+                              'amountBfUse' => $dp->available,
+                              'amountAfUse' => $available > 0 ? $available : 0,
+                              'payment_role' => $dp->payment_role,
+                              'acc_id' => $dp->acc_id,
+                              'user' => $this->_user->uname
+                            );
+
+                            if (! $this->order_down_payment_model->add_detail($arr))
+                            {
+                              $sc = FALSE;
+                              $this->error = "บันทึกรายการตัดยอดเงินมัดจำไม่สำเร็จ";
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+
+                if ($sc === TRUE)
+                {
+                  $this->db->trans_commit();
+                }
+                else
+                {
+                  $this->db->trans_rollback();
+                }
+
+                if ($sc === TRUE)
+                {
+                  $this->load->library('export');
+                  $this->export->export_invoice($code);
+                }
+              }
+              else
+              {
+                $sc = FALSE;
+                $this->error = "Failed to create Invoice";
+              }
+            }
+            else
+            {
+              $sc = FALSE;
+              $this->error = "Cannot generate Document Number";
+            }
+          }
+          else
+          {
+            $sc = FALSE;
+            $this->error = "Cannot generate Document Prefix";
+          }
+        }
+        else
+        {
+          $sc = FALSE;
+          $this->error = "ไม่พบรายการบันทึกขาย";
+        }
+      }
+      else
+      {
+        $sc = FALSE;
+        $this->error = "เอกสารถูกเปิด invoice แล้ว";
+      }
+    }
+    else
+    {
+      $sc = FALSE;
+      $this->error = "Invalid document state";
+    }
+
+    $arr = array(
+      'status' => $sc === TRUE ? 'success' : 'failed',
+      'message' => $sc === TRUE ? 'success' : $this->error,
+      'invoice_code' => $sc === TRUE ? $code : NULL,
+      'invoice_id' => $sc === TRUE ? $id : NULL,
+      'ex' => $ex
+    );
+
+    return $arr;
+  }
 
   private function add_pos_invoice($order)
   {
@@ -1941,7 +2332,7 @@ class Order_invoice extends PS_Controller
           $order->whtAmount = $order->WhtAmount;
           $order->payment_role = $payment_role;
 
-          $result = $this->add_by_order($order);
+          $result = $order->role === 'U' ? $this->add_by_wu($order) : $this->add_by_wo($order);
 
           if( ! empty($result))
           {
@@ -1995,7 +2386,7 @@ class Order_invoice extends PS_Controller
           $result = $this->add_by_wo($ds);
           break;
         case "WU" :
-          $result = $this->add_by_order($ds);
+          $result = $this->add_by_wu($ds);
           break;
         case "POS" :
           $result = $this->add_by_pos($ds);
@@ -2087,399 +2478,7 @@ class Order_invoice extends PS_Controller
     echo json_encode($arr);
   }
 
-
-  private function add_by_order($ds)
-  {
-    $sc = TRUE;
-    $ex = 0;
-    $order = $this->orders_model->get($ds->billCode);
-
-    if($order->state == 8)
-    {
-      if( empty($order->invoice_code))
-      {
-        $details = $this->invoice_model->get_details($order->code); //--- รายการที่มีการบันทึกขายไป
-
-        if( ! empty($details))
-        {
-          $VatSum = 0.00;
-          $DocTotal = 0.00;
-          $totalBefDisc = 0;
-          $DiscSum = 0.00;
-
-          $doc_date = db_date($ds->date_add);
-
-          $pre = $this->getInvoicePrefixData('WU', is_true($ds->is_term), $ds->taxStatus);
-
-          if( ! empty($pre))
-          {
-            $code = $this->get_new_code($pre->prefix, $pre->running, $doc_date);
-            $bookcode = $pre->bookcode;
-            $U_BOOKCODE = $pre->U_BOOKCODE;
-
-            if( ! empty($code))
-            {              
-              $arr = array(
-                'code' => $code,
-                'bookcode' => $bookcode,
-                'U_BOOKCODE' => $U_BOOKCODE,
-                'is_term' => $ds->is_term,
-                'vat_type' => $ds->vat_type,
-                'TaxStatus' => $ds->taxStatus,
-                'tax_id' => $ds->tax_id,
-                'DocDate' => $doc_date,
-                'DocDueDate' => $doc_date,
-                'TaxDate' => $doc_date,
-                'CardCode' => $ds->customer_code,
-                'CardName' => $ds->customer_name,
-                'isCompany' => $ds->is_company,
-                'branch_code' => $ds->branch_code,
-                'branch_name' => $ds->branch_name,
-                'NumAtCard' => $ds->customer_ref,
-                'address' => $ds->address,
-                'sub_district' => $ds->sub_district,
-                'district' => $ds->district,
-                'province' => $ds->province,
-                'postcode' => $ds->postcode,
-                'phone' => $ds->phone,
-                'DiscPrcnt' => $ds->billDiscPrcnt,
-                'DiscSum' => $ds->billDiscAmount,
-                'VatSum' => $ds->vatSum,
-                'DocTotal' => $ds->docTotal,
-                'BaseType' => $ds->refType,
-                'BaseRef' => $order->code,
-                'so_code' => $order->so_code,
-                'order_code' => $order->code,
-                'bill_code' => NULL,
-                'Comments' => get_null($ds->remark) .( ! empty($order->so_code) ? "BaseOn Sales Order {$order->so_code}" : ""),
-                'WhsCode' => $order->warehouse_code,
-                'SlpCode' => $ds->sale_id,
-                'shipped_date' => now(),
-                'user' => $this->_user->uname,
-                'channels_code' => $order->channels_code,
-                'payment_role' => $ds->payment_role,
-                'isWht' => $ds->whtPrcnt > 0 ? 1 : 0,
-                'WhtPrcnt' => $ds->whtPrcnt,
-                'WhtAmount' => $ds->whtAmount,
-                'downPaymentAmount' => $ds->totalDownAmount
-              );
-
-              $this->db->trans_begin();
-
-              $id = $this->order_invoice_model->add($arr);
-
-              if( $id )
-              {
-                $lineNum = 0;
-
-                foreach($details as $rs)
-                {
-                  if($sc === FALSE)
-                  {
-                    break;
-                  }
-
-                  $LineTotal = $ds->vat_type == 'E' ? $rs->total_amount : remove_vat($rs->total_amount, $rs->VatRate);
-
-                  $arr = array(
-                    'bookcode' => $bookcode,
-                    'invoice_id' => $id,
-                    'invoice_code' => $code,
-                    'LineNum' => $lineNum,
-                    'BaseType' => $ds->refType,
-                    'BaseRef' => $rs->reference,
-                    'BaseLine' => $rs->order_detail_id,
-                    'so_line_id' => $rs->so_line_id,
-                    'ItemCode' => $rs->product_code,
-                    'Dscription' => $rs->product_name,
-                    'Qty' => $rs->qty,
-                    'Price' => $ds->vat_type == 'E' ? $rs->sell : remove_vat($rs->sell, $rs->VatRate), //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
-                    'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price),
-                    'PriceBefDi' => $ds->vat_type == 'E' ? $rs->price : remove_vat($rs->price, $rs->VatRate), //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
-                    'LineTotal' => $LineTotal,
-                    'VatType' => $ds->vat_type,
-                    'VatCode' => $rs->VatCode,
-                    'VatRate' => $rs->VatRate,
-                    'PriceAfVAT' => $ds->vat_type == 'E' ? add_vat($rs->sell, $rs->VatRate) : $rs->sell,
-                    'VatSum' => $rs->VatSum,
-                    'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
-                    'avgBillDiscAmount' => $rs->avgBillDiscAmount,
-                    'sumBillDiscAmount' => $rs->sumBillDiscAmount,
-                    'SlpCode' => $rs->sale_code,
-                    'WhsCode' => $rs->warehouse_code,
-                    'BinCode' => $rs->zone_code,
-                    'DocDate' => $doc_date,
-                    'shipped_date' => $doc_date,
-                    'LineText' => $rs->line_text,
-                    'is_count' => $rs->is_count
-                  );
-
-                  if($this->order_invoice_model->add_detail($arr))
-                  {
-                    $totalBefDisc += $rs->total_amount;
-                    $VatSum += $rs->VatSum;
-                    $DiscSum += $rs->sumBillDiscAmount;
-                    $lineNum++;
-
-                    if( ! $this->orders_model->update_detail($rs->order_detail_id, ['is_complete' => 1]))
-                    {
-                      $sc = FALSE;
-                      $this->error = "Failed to update Order line status";
-                    }
-
-                    //--- update so open qty
-                    if($sc === TRUE && ! empty($rs->so_line_id))
-                    {
-                      $sol = $this->sales_order_model->get_detail($rs->so_line_id);
-
-                      if( ! empty($sol))
-                      {
-                        if($sol->line_status == 'O')
-                        {
-                          if($sol->OpenQty > 0 && $sol->OpenQty >= $rs->qty)
-                          {
-                            $OpenQty = $sol->OpenQty - $rs->qty;
-
-                            $arr = array(
-                              'OpenQty' => $OpenQty,
-                              'line_status' => $OpenQty == 0 ? 'C' : 'O'
-                            );
-
-                            if( ! $this->sales_order_model->update_detail($rs->so_line_id, $arr))
-                            {
-                              $sc = FALSE;
-                              $this->error = "Failed to update OpenQty On Line Id : {$rs->so_line_id}";
-                            }
-                          }
-                          else
-                          {
-                            $sc = FALSE;
-                            $this->error = "จำนวนที่เปิด invoice มากกว่าจำนวนคงค้างในใบสั่งขาย {$rs->so_code} : {$rs->product_code}";
-                          }
-                        }
-                        else
-                        {
-                          $sc = FALSE;
-                          $this->error = "สถานะรายการในใบสั่งขายถูกปิดไปแล้ว {$rs->so_code} : {$rs->product_code}";
-                        }
-                      }
-                      else
-                      {
-                        $sc = FALSE;
-                        $this->error = "ไม่พบรายการเชื่อมโยงในใบสั่งขาย {$rs->so_code} : {$rs->product_code}";
-                      }
-                    } //--- end if so_line_id
-                  }
-                  else
-                  {
-                    $sc = FALSE;
-                    $this->error = "Failed to insert invoice at line {$lineNum}";
-                  } //--- end if add_detail
-                } //--- end foreach
-
-                if($sc === TRUE)
-                {
-                  $DocTotal = $totalBefDisc - $DiscSum;
-                  $DocTotal = $ds->vat_type == 'E' ? $DocTotal + $VatSum : $DocTotal;
-
-                  $arr = array(
-                    'DiscSum' => $DiscSum,
-                    'VatSum' => $VatSum,
-                    'DocTotal' => $DocTotal
-                  );
-
-                  if(empty($ds->downPaymentUse))
-                  {
-                    $dps = $this->order_down_payment_model->get_by_reference($order->code);
-
-                    if( ! empty($dps))
-                    {
-                      $doc_total = $ds->vat_type == 'E' ? $DocTotal + $VatSum : $DocTotal;
-                      $downPaymentUse = array();
-                      $downPaymentAmount = 0;
-
-                      foreach($dps as $dp)
-                      {
-                        if($doc_total > 0)
-                        {
-                          if($dp->available > 0)
-                          {
-                            $amount = $dp->available <= $doc_total ? $dp->available : $doc_total;
-                            $dpu = new stdClass();
-                            $dpu->id = $dp->id;
-                            $dpu->amount = $amount;
-
-                            $downPaymentUse[] = $dpu;
-
-                            $doc_total -= $amount;
-                            $downPaymentAmount += $amount;
-                          }
-                        }
-                      } //--- end foreach;
-
-                      $ds->downPaymentUse = $downPaymentUse;
-
-                      $arr['downPaymentAmount'] = $downPaymentAmount;
-                    }
-                  }
-
-
-                  if( ! $this->order_invoice_model->update_by_id($id, $arr))
-                  {
-                    $sc = FALSE;
-                    $this->error = "Failed to update Invoice Summary";
-                  }
-                }
-
-                if($sc === TRUE)
-                {
-                  if( ! $this->orders_model->update($order->code, ['invoice_code' => $code]))
-                  {
-                    $sc = FALSE;
-                    $this->error = "Failed to update invoice code On Orders";
-                  }
-                }
-
-                if($sc === TRUE && ! empty($order->so_code))
-                {
-                  //---- close so if all line closed
-                  $count = $this->sales_order_model->count_open_line($order->so_code);
-
-                  if($count == 0)
-                  {
-                    $this->sales_order_model->update($order->so_code, ['status' => 'C']);
-                  }
-                }
-
-                if($sc === TRUE)
-                {
-
-                  if( ! empty($ds->downPaymentUse))
-                  {
-                    foreach($ds->downPaymentUse as $rs)
-                    {
-                      if($sc === FALSE)
-                      {
-                        break;
-                      }
-
-                      $dp = $this->order_down_payment_model->get_by_id($rs->id);
-
-                      if( ! empty($dp))
-                      {
-                        if($dp->status == 'O') {
-                          $used = $dp->used + $rs->amount;
-                          $available = $dp->amount - $used;
-                          $status = $available > 0 ? 'O' : 'C';
-
-                          $arr = array(
-                            'ref_code' => $code,
-                            'used' => $used,
-                            'available' => $available > 0 ? $available : 0,
-                            'status' => $status
-                          );
-
-
-                          if( ! $this->order_down_payment_model->update($dp->id, $arr))
-                          {
-                            $sc = FALSE;
-                            $this->error = "ตัดยอดเงินมัดจำไม่สำเร็จ";
-                          }
-
-                          if($sc === TRUE)
-                          {
-                            $arr = array(
-                              'down_payment_id' => $dp->id,
-                              'down_payment_code' => $dp->code,
-                              'TargetRef' => $order->code,
-                              'TargetType' => $ds->refType,
-                              'so_code' => $order->so_code,
-                              'order_code' => $order->code,
-                              'bill_code' => NULL,
-                              'invoice_code' => $code,
-                              'amount' => $rs->amount,
-                              'amountBfUse' => $dp->available,
-                              'amountAfUse' => $available > 0 ? $available : 0,
-                              'payment_role' => $dp->payment_role,
-                              'acc_id' => $dp->acc_id,
-                              'user' => $this->_user->uname
-                            );
-
-                            if( ! $this->order_down_payment_model->add_detail($arr))
-                            {
-                              $sc = FALSE;
-                              $this->error = "บันทึกรายการตัดยอดเงินมัดจำไม่สำเร็จ";
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-
-                if($sc === TRUE)
-                {
-                  $this->db->trans_commit();
-                }
-                else
-                {
-                  $this->db->trans_rollback();
-                }
-
-                if($sc === TRUE)
-                {
-                  $this->load->library('export');
-                  $this->export->export_invoice($code);
-                }
-              }
-              else
-              {
-                $sc = FALSE;
-                $this->error = "Failed to create Invoice";
-              }
-            }
-            else
-            {
-              $sc = FALSE;
-              $this->error = "Cannot generate Document Number";
-            }
-          }
-          else
-          {
-            $sc = FALSE;
-            $this->error = "Cannot generate Document Prefix";
-          }
-        }
-        else
-        {
-          $sc = FALSE;
-          $this->error = "ไม่พบรายการบันทึกขาย";
-        }
-      }
-      else
-      {
-        $sc = FALSE;
-        $this->error = "เอกสารถูกเปิด invoice แล้ว";
-      }
-    }
-    else
-    {
-      $sc = FALSE;
-      $this->error = "Invalid document state";
-    }
-
-    $arr = array(
-      'status' => $sc === TRUE ? 'success' : 'failed',
-      'message' => $sc === TRUE ? 'success' : $this->error,
-      'invoice_code' => $sc === TRUE ? $code : NULL,
-      'invoice_id' => $sc === TRUE ? $id : NULL,
-      'ex' => $ex
-    );
-
-    return $arr;
-  }
-
-
+  
   public function view_detail($code)
   {
     $order = $this->order_invoice_model->get($code);
