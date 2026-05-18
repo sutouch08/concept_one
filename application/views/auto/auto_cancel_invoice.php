@@ -95,9 +95,11 @@
     max = parseDefault(parseInt($('#count').val()), 0);
 
     $('.order').each(function() {
+      let code = $(this).val();
       let invoice = $(this).data('invoice');
       let id = $(this).data('id');
       orders.push({
+        'code':code,
         'invoice': invoice,
         'id': id
       });
@@ -170,7 +172,7 @@
 
   function update_status(code, status, message) {
     $.ajax({
-      url: BASE_URL + 'auto/auto_change_state/update_status',
+      url: BASE_URL + 'auto/auto_cancel_invoice/update_status',
       type: 'POST',
       cache: false,
       data: {
