@@ -974,7 +974,7 @@ class Order_invoice extends PS_Controller
             $totalBefDisc = 0;
             $DiscSum = 0.00;
 
-            $doc_date = date('Y-m-d');
+            $doc_date = getConfig('ORDER_SOLD_DATE') == 'D' ? $order->date_add : date('Y-m-d');
             $type = empty($order->so_code) ? 'POS' : 'ORDER';
             $pre = $this->getInvoicePrefixData($type, is_true($ds->is_term), $ds->taxStatus);
 
@@ -1251,7 +1251,7 @@ class Order_invoice extends PS_Controller
           $totalBefDisc = 0;
           $DiscSum = 0.00;
 
-          $doc_date = date('Ymd'); //db_date($ds->date_add);
+          $doc_date = getConfig('ORDER_SOLD_DATE') == 'D' ? $order->date_add : date('Y-m-d');
 
           $pre = $this->getInvoicePrefixData('ORDER', is_true($ds->is_term), $ds->taxStatus);
 
@@ -1604,7 +1604,7 @@ class Order_invoice extends PS_Controller
           $totalBefDisc = 0;
           $DiscSum = 0.00;
 
-          $doc_date = db_date($ds->date_add);
+          $doc_date = getConfig('ORDER_SOLD_DATE') == 'D' ? $order->date_add : date('Y-m-d');
 
           $pre = $this->getInvoicePrefixData('WU', is_true($ds->is_term), $ds->taxStatus);
 
@@ -1997,7 +1997,7 @@ class Order_invoice extends PS_Controller
             $totalBefDisc = 0;
             $DiscSum = 0.00;
 
-            $doc_date = date('Y-m-d');
+            $doc_date = getConfig('ORDER_SOLD_DATE') == 'D' ? $order->date_add : date('Y-m-d');
             $type = empty($order->so_code) ? 'POS' : 'ORDER';
             $is_term = FALSE;
             $taxStatus = 'N';
