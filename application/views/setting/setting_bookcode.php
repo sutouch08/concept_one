@@ -5,14 +5,7 @@
 			<input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_ORDER" value="<?php echo $BOOK_CODE_ORDER; ?>" />
 			<span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบสั่งขาย"</span>
 		</div>
-		<div class="divider-hidden"></div>
-
-		<div class="col-sm-3"><span class="form-control left-label">ใบกำกับ POS</span></div>
-		<div class="col-sm-8">
-			<input type="text" class="form-control input-sm input-small bookcode text-center" name="BOOK_CODE_POS_INVOICE" value="<?php echo $BOOK_CODE_POS_INVOICE; ?>" />
-			<span class="help-block">กำหนดรหัสเล่มเอกสาร "ใบกำกับภาษี POS"</span>
-		</div>
-		<div class="divider-hidden"></div>
+		<div class="divider-hidden"></div>		
 
 		<div class="col-sm-3"><span class="form-control left-label">เบิกอภินันท์</span></div>
 		<div class="col-sm-8">
