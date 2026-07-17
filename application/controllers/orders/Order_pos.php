@@ -578,6 +578,7 @@ class Order_pos extends PS_Controller
             'shop_id' => $pos->shop_id,
             'pos_id' => $pos->id,
             'payment_code' => $pos->cash_payment,
+            'vat_type' => $pos->use_vat ? 'I' : 'N',
             'vat_rate' => $pos->use_vat ? getConfig('SALE_VAT_RATE') : 0,
             'uname' => $this->_user->uname
           );
@@ -620,8 +621,7 @@ class Order_pos extends PS_Controller
         		}
           }
 
-          //--- update bill discount
-          $billDiscPercent = $order->bill_disc_percent;
+          //--- update bill discount          
           $billDiscAmount = $billDiscPrcnt > 0 ? round($totalBfDisc * ($billDiscPrcnt * 0.01), 2) : round($billDiscAmount, 2);
 
         	//---- bill discount amount
@@ -629,8 +629,7 @@ class Order_pos extends PS_Controller
         	// $amountBeforeDiscWithTax = $totalTaxAmount;   //-- มูลค่าสินค้า เฉพาะที่มีภาษี
         	//--- คำนวนภาษี หากมีส่วนลดท้ายบิล
         	//--- เฉลี่ยส่วนลดออกให้ทุกรายการ โดยเอาส่วนลดท้ายบิล(จำนวนเงิน)/มูลค่าสินค้าก่อนส่วนลด
-        	//--- ได้มูลค่าส่วนลดท้ายบิลที่เฉลี่ยนแล้ว ต่อ บาท เช่น หารกันมาแล้ว ได้ 0.16 หมายถึงทุกๆ 1 บาท จะลดราคา 0.16 บาท
-        	$avgBillDiscAmount = $totalBfDisc > 0 ? round($billDiscAmount/$totalBfDisc, 6) : 0;
+        	//--- ได้มูลค่าส่วนลดท้ายบิลที่เฉลี่ยนแล้ว ต่อ บาท เช่น หารกันมาแล้ว ได้ 0.16 หมายถึงทุกๆ 1 บาท จะลดราคา 0.16 บาท        	
 
           //--- คำนวนภาษี
         	//--- นำผลลัพธ์ข้างบนมาคูณ กับ มูลค่าที่ต้องคิดภาษี (ตัวที่ไม่มีภาษีไม่เอามาคำนวณ)
@@ -1140,6 +1139,7 @@ class Order_pos extends PS_Controller
     $channels_code = $this->input->post('channels_code');
     $payment_code = $this->input->post('payment_code');
     $is_free = $this->input->post('is_free');
+    $vat_type = $this->input->post('vat_type');
 
     $qty = $this->input->post('qty') <= 0 ? 1 : $this->input->post('qty');
 
@@ -1180,7 +1180,7 @@ class Order_pos extends PS_Controller
               'discount_amount' => $is_free ? ($item->price * $Qty) : $discount['amount'],
               'final_price' => $is_free ? 0.00 : $sell_price,
               'total_amount' => $is_free ? 0.00 : $total_amount,
-              'vat_amount' => $is_free ? 0.00 : get_vat_amount($total_amount, $detail->vat_rate, 'I'),
+              'vat_amount' => $is_free ? 0.00 : ($vat_type == 'N' ? 0.00 : get_vat_amount($total_amount, $detail->vat_rate, 'I')),
               'id_rule' => $is_free ? NULL : $discount['id_rule']
             );
 
@@ -1233,9 +1233,10 @@ class Order_pos extends PS_Controller
   						'discount_amount' => $is_free ? ($item->price * $qty) : $discount['amount'],
   						'final_price' => $is_free ? 0.00 : $sell_price,
   						'total_amount' => $is_free ? 0.00 : $total_amount,
-              'vat_code' => $item->sale_vat_code,
-  						'vat_rate' => $item->sale_vat_rate,
-  						'vat_amount' => $is_free ? 0.00 : get_vat_amount($total_amount, $item->sale_vat_rate, 'I'), //-- vat type 'I' => include, E = exclude
+              'vat_type' => $vat_type,
+              'vat_code' => $vat_type == 'N' ? 'S00' : $item->sale_vat_code,
+  						'vat_rate' => $vat_type == 'N' ? 0 : $item->sale_vat_rate,
+  						'vat_amount' => $is_free ? 0.00 : ($vat_type == 'N' ? 0.00 : get_vat_amount($total_amount, $item->sale_vat_rate, 'I')), //-- vat type 'I' => include, E = exclude
   						'is_count' => $item->count_stock,
               'is_free' => $is_free,
               'id_rule' => $is_free ? NULL : $discount['id_rule'],
@@ -3772,8 +3773,7 @@ class Order_pos extends PS_Controller
 	public function update_item()
 	{
 		$sc = TRUE;
-		$result = array();
-
+		
 		$this->load->helper('discount');
 
 		$id = $this->input->post('id');

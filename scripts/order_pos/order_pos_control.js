@@ -293,6 +293,7 @@ function addToTemp(barcode, qty, is_free)
 	let payment_code = $('#payment-code').val();
 	let channels_code = $('#channels-code').val();
 	let customer_code = $('#customer-code').val();
+	let vat_type = $('#vat-type').val();
 
 	if(barcode.length > 0) {
 
@@ -303,6 +304,7 @@ function addToTemp(barcode, qty, is_free)
 			data:{
         'pos_id' : pos_id,
 				'order_temp_id' : temp_id,
+				'vat_type' : vat_type,
 				'customer_code' : customer_code,
 				'channels_code' : channels_code,
 				'payment_code' : payment_code,

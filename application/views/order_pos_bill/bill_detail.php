@@ -15,7 +15,9 @@
 		<?php if($order->status == 'O' && empty($order->invoice_code)) : ?>
 			<button type="button" class="btn btn-xs btn-success" onclick="showCustomerModal()">ข้อมูลลูกค้า</button>
 			<button type="button" class="btn btn-xs btn-purple" onclick="createInvoice()">เปิดใบกำกับ</button>
-			<button type="button" class="btn btn-xs btn-primary" onclick="createTaxInvoice()">เปิดใบกำกับภาษี</button>
+			<?php if($order->vat_type != 'N') : ?>
+				<button type="button" class="btn btn-xs btn-primary" onclick="createTaxInvoice()">เปิดใบกำกับภาษี</button>
+			<?php endif; ?>			
 			<?php if(($order->status == 'O' && (date('Y-m-d') <= date('Y-m-d', strtotime($order->date_add)))) OR $this->_SuperAdmin) : ?>
 				<button type="button" class="btn btn-xs btn-danger" onclick="cancelBill('<?php echo $order->code; ?>', <?php echo $order->id; ?>)">
 					<i class="fa fa-times"></i> ยกเลิก</button>
@@ -346,7 +348,8 @@
         </div>
       </div>
 
-			<div class="form-group" id="bill-vat" >
+			<?php $hide = $order->vat_type == 'N' ? 'hide' : ''; ?>
+			<div class="form-group <?php echo $hide; ?>" id="bill-vat" >
 				<label class="col-lg-6 col-md-6 col-sm-6 control-label no-padding-right">VAT</label>
 				<div class="col-lg-2 col-md-2 col-sm-2 padding-5">
 					<input type="text" id="vat_type" class="form-control input-sm text-center" value="<?php echo ($order->vat_type == 'E' ? 'Exclude' : 'Include'); ?>" disabled/>

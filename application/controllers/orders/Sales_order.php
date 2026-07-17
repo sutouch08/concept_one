@@ -214,7 +214,7 @@ class Sales_order extends PS_Controller
         'TaxStatus' => $header->TaxStatus,
         'vat_type' => $header->vat_type,
         'vat_rate' => 0.00,
-        'vatSum' => $header->vatSum,
+        'vatSum' => $header->vat_type == 'N' ? 0 : $header->vatSum,
         'TotalBfDisc' => $header->totalAmount,
         'DiscPrcnt' =>  $header->discPrcnt,
         'DiscAmount' => $header->discAmount,
@@ -277,7 +277,7 @@ class Sales_order extends PS_Controller
         {
           $no = 1;
 
-          $vat_type = $header->vat_type == 'E' ? 'E' : 'I';
+          $vat_type = $header->vat_type;
 
           foreach($items as $rs)
           {
@@ -288,7 +288,7 @@ class Sales_order extends PS_Controller
 
             $avgBillDiscAmount = $header->totalAmount > 0 ? $header->discAmount/$header->totalAmount : 0;
             $sumBillDiscAmount = $rs->totalAmount * $avgBillDiscAmount;
-            $vatSum = get_vat_amount($rs->totalAmount - $sumBillDiscAmount, $rs->vat_rate, $vat_type);
+            $vatSum = $vat_type == 'N' ? 0 : get_vat_amount($rs->totalAmount - $sumBillDiscAmount, $rs->vat_rate, $vat_type);
 
             $arr = array(
               'id_order' => $id,
@@ -303,9 +303,9 @@ class Sales_order extends PS_Controller
               'sell_price' => $rs->price - $rs->discAmount,
               'qty' => $rs->qty,
               'OpenQty' => $rs->qty,
-              'vat_type' => $header->vat_type,
-              'vat_code' => $rs->vat_code,
-              'vat_rate' => $rs->vat_rate,
+              'vat_type' => $vat_type,
+              'vat_code' => $vat_type == 'N' ? 'S00' : $rs->vat_code,
+              'vat_rate' => $vat_type == 'N' ? 0 : $rs->vat_rate,
               'vat_amount' => $vatSum,
               'discount_label' => $rs->discLabel,
               'discount_amount' => $rs->discAmount,
@@ -564,7 +564,7 @@ class Sales_order extends PS_Controller
             'TaxStatus' => $header->TaxStatus,
             'vat_type' => $header->vat_type,
             'vat_rate' => 0.00,
-            'vatSum' => $header->vatSum,
+            'vatSum' => $header->vat_type == 'N' ? 0 : $header->vatSum,
             'TotalBfDisc' => $header->totalAmount,
             'DiscPrcnt' =>  $header->discPrcnt,
             'DiscAmount' => $header->discAmount,
@@ -622,7 +622,7 @@ class Sales_order extends PS_Controller
             {
               $no = 1;
               $existsIds = []; //---- รวม id ที่มีการ update นอกจากนั้นจะทำการลบออก
-              $vat_type = $header->vat_type == 'E' ? 'E' : 'I';
+              $vat_type = $header->vat_type;
 
               foreach($items as $rs)
               {
@@ -633,7 +633,7 @@ class Sales_order extends PS_Controller
 
                 $avgBillDiscAmount = $header->totalAmount > 0 ? $header->discAmount/$header->totalAmount : 0;
                 $sumBillDiscAmount = $rs->totalAmount * $avgBillDiscAmount;
-                $vatSum = get_vat_amount($rs->totalAmount - $sumBillDiscAmount, $rs->vat_rate, $vat_type);
+                $vatSum = $vat_type == 'N' ? 0 : get_vat_amount($rs->totalAmount - $sumBillDiscAmount, $rs->vat_rate, $vat_type);
 
                 if($rs->id != 0 )
                 {
@@ -649,10 +649,10 @@ class Sales_order extends PS_Controller
                       'sell_price' => $rs->price - $rs->discAmount,
                       'qty' => $rs->qty,
                       'OpenQty' => $rs->openQty,
-                      'vat_type' => $header->vat_type,
-                      'vat_code' => $rs->vat_code,
-                      'vat_rate' => $rs->vat_rate,
-                      'vat_amount' => $vatSum,
+                      'vat_type' => $vat_type,
+                      'vat_code' => $vat_type == 'N' ? 'S00' : $rs->vat_code,
+                      'vat_rate' => $vat_type == 'N' ? 0 : $rs->vat_rate,
+                      'vat_amount' => $vat_type == 'N' ? 0 : $vatSum,
                       'discount_label' => $rs->discLabel,
                       'discount_amount' => $rs->discAmount,
                       'total_amount' => $rs->totalAmount,
@@ -693,10 +693,10 @@ class Sales_order extends PS_Controller
                     'sell_price' => $rs->price - $rs->discAmount,
                     'qty' => $rs->qty,
                     'OpenQty' => $rs->openQty,
-                    'vat_type' => $header->vat_type,
-                    'vat_code' => $rs->vat_code,
-                    'vat_rate' => $rs->vat_rate,
-                    'vat_amount' => $vatSum,
+                    'vat_type' => $vat_type,
+                    'vat_code' => $vat_type == 'N' ? 'S00' : $rs->vat_code,
+                    'vat_rate' => $vat_type == 'N' ? 0 : $rs->vat_rate,
+                    'vat_amount' => $vat_type == 'N' ? 0 : $vatSum,
                     'discount_label' => $rs->discLabel,
                     'discount_amount' => $rs->discAmount,
                     'total_amount' => $rs->totalAmount,

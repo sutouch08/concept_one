@@ -73,7 +73,7 @@
           </div>
         </div>
 
-        <?php $vat_type = $order->vat_type == 'E' ? 'Exclude' : 'Include'; ?>
+        <?php $vat_type = $order->vat_type == 'N' ? 'No VAT' : ($order->vat_type == 'E' ? 'Exclude' : 'Include'); ?>
         <div class="form-group">
           <label class="col-lg-2-harf col-md-2 col-sm-2 control-label no-padding-right font-size-11 ">หัก ณ ที่จ่าย</label>
           <div class="col-lg-1-harf col-md-2 col-sm-2 padding-5">
