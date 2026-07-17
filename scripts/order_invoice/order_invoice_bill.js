@@ -42,7 +42,6 @@ function toggleVatType() {
   recalTotal();
 }
 
-
 function toggleFormBranch() {
 	if($('#form-is-company').is(':checked')) {
 		$('#form-branch-code').val('00000');
@@ -1302,9 +1301,9 @@ function recalTotal() {
 	let billDiscAmount = roundNumber(parseDefault(parseFloat(removeCommas($('#bill-disc-amount').val())), 0.00), 2); //--- มูลค่าส่วนลดท้ายบิล
   let billDiscPrcnt = roundNumber(parseDefault(parseFloat($('#bill-disc-percent').val()), 0), 2);
 	let totalTaxAmount = 0.00; //-- มูลค่าภาษีรวมหลังส่วนลดท้ายบิล
-	let downPayment = parseDefault(parseFloat($('#down-amount').val()), 0.00);
+	let downPayment = parseDefault(parseFloat(removeCommas($('#down-amount').val())), 0.00);
 	let whtPrcnt = roundNumber(parseDefault(parseFloat($('#whtPrcnt').val()), 0.00), 2); //--- หัก ณ ที่จ่าย
-	let vatType = $('#vat-type').val() == 'E' ? 'E' : 'I';
+	let vatType = $('#vat-type').val();// == 'E' ? 'E' : 'I';
 
 	$('.line-qty').each(function() {
 		let no = $(this).data('id');
@@ -1324,7 +1323,7 @@ function recalTotal() {
   }
 
   amountAfterDisc = parseDefault(parseFloat(totalBfDisc - billDiscAmount), 0.00); //--- มูลค่าสินค้า หลังหักส่วนลดท้ายบิล
-
+	
 	//---- เฉลี่ยส่วนลดท้ายบิล
 	//--- เฉลี่ยส่วนลดออกให้ทุกรายการ โดยเอาส่วนลดท้ายบิล(จำนวนเงิน)/มูลค่าสินค้าก่อนส่วนลด
 	//--- ได้มูลค่าส่วนลดท้ายบิลที่เฉลี่ยนแล้ว ต่อ บาท เช่น หารกันมาแล้ว ได้ 0.16 หมายถึงทุกๆ 1 บาท จะลดราคา 0.16 บาท
@@ -1338,7 +1337,7 @@ function recalTotal() {
 		let qty = roundNumber(parseDefault(parseFloat($('#qty-'+no).val()), 0.00), 2);
 		let price = roundNumber(parseDefault(parseFloat($('#price-'+no).val()), 0.00), 2); //--- ราคาขายก่อนส่วนลดรายการ
 		let amount = roundNumber(parseDefault(parseFloat(removeCommas($('#total-'+no).val())), 0.00), 2); //--- มูลค่ารวมหลังส่วนลดรายการของแต่ละ item (qty * (price - discount))
-		let rate = parseDefault(parseFloat($('#qty-'+no).data('vatrate')), 0.00); //--- ภาษีของแต่ละ Item
+		let rate = vatType == 'N' ? 0 : parseDefault(parseFloat($('#qty-'+no).data('vatrate')), 0.00); //--- ภาษีของแต่ละ Item
 
 		if(qty > 0 && price > 0)
 		{
@@ -1349,14 +1348,13 @@ function recalTotal() {
 			}
 		}
 	});
-
-
+	
 	totalTaxAmount = roundNumber(totalTaxAmount, 2);
 	whtAmount = vatType == 'E' ? roundNumber(amountAfterDisc * (whtPrcnt * 0.01)) : roundNumber((amountAfterDisc - totalTaxAmount) * (whtPrcnt * 0.01), 2);
 	amountAfterDiscAndTax = vatType == 'E' ? roundNumber(amountAfterDisc + totalTaxAmount, 2) : roundNumber(amountAfterDisc, 2);
 
-  docTotal = vatType == 'E' ? roundNumber((amountAfterDisc + totalTaxAmount), 2) : roundNumber(amountAfterDisc, 2);
-	docTotal = docTotal - downPayment - whtAmount;
+  docTotal = vatType == 'E' ? roundNumber((amountAfterDisc + totalTaxAmount), 2) : roundNumber(amountAfterDisc, 2);	
+	docTotal = docTotal - whtAmount;
 
 	//--- update bill discount
 	$('#total-qty').val(addCommas(totalQty));

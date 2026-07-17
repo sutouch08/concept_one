@@ -23,7 +23,8 @@ function select_warehouse($se = 0)
   $sc = '';
   $CI =& get_instance();
   $CI->load->model('masters/warehouse_model');
-  $options = $CI->warehouse_model->get_all_warehouse_list();
+  $activeOnly = FALSE;
+  $options = $CI->warehouse_model->get_all_warehouse_list($activeOnly);
 
   if(!empty($options))
   {

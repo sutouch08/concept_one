@@ -49,7 +49,7 @@
 					<?php echo select_user_id($ds->user_id); ?>
 				</select>
 			</div>
-			<div class="help-block col-xs-12 col-sm-reset inline red" id="warehouse-error"></div>
+			<div class="help-block col-xs-12 col-sm-reset inline red" id="user-error"></div>
 		</div>
 
     <div class="form-group">

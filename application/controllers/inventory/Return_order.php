@@ -349,11 +349,7 @@ class Return_order extends PS_Controller
 
         $arr = array(
           'status' => 1,
-          'is_approve' => 0,
-          'is_accept' => NULL,
-          'accept_on' => NULL,
-          'accept_by' => NULL,
-          'accept_remark' => NULL
+          'is_approve' => 0
         );
 
 

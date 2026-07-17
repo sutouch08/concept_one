@@ -278,10 +278,7 @@ class Export
       }
 
       if($sc === TRUE)
-      {
-        $currency = getConfig('CURRENCY');
-        $vat_code = getConfig('SALE_VAT_CODE');
-        $vat_type = $order->vat_type;
+      {        
         $address = parseAddress($order->address, $order->sub_district, $order->district, $order->province, $order->postcode);
         $payment_type = "";
         $payment_type .= "หักมัดจำ : ".$order->downPaymentAmount;
@@ -417,14 +414,14 @@ class Export
                 'TotalFrgn' => 0.00, //--- จำนวนเงินรวม By Line (Currency)
                 'WhsCode' => ($rs->is_count == 1 ? $rs->WhsCode : $service_wh),
                 'BinCode' => ($rs->is_count == 1 ? $rs->BinCode : $service_wh."-SYSTEM-BIN-LOCATION"),
-                'TaxStatus' => 'Y',
+                'TaxStatus' => $order->TaxStatus,
                 'VatPrcnt' => $rs->VatRate,
                 'VatGroup' => $rs->VatCode,
                 'PriceAfVat' => $rs->PriceAfVAT,
                 'GTotal' => round($rs->LineTotal, 2),
                 'VatSum' => round($rs->VatSum, 2), //---- tool_helper
                 'SlpCode' => $rs->SlpCode,
-                'TaxType' => 'Y', //--- คิดภาษีหรือไม่
+                'TaxType' => $order->TaxStatus, //--- คิดภาษีหรือไม่
                 'F_E_Commerce' => $option, //--- A = Add , U = Update
                 'F_E_CommerceDate' => sap_date(now(), TRUE),
                 'U_PROMOTION' => NULL

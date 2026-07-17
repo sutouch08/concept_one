@@ -223,16 +223,21 @@ class Warehouse_model extends CI_Model
     return FALSE;
   }
 
-  public function get_all_warehouse_list()
+  public function get_all_warehouse_list($active = TRUE)
   {
-    $rs = $this->db->where('active', 1)->order_by('code', 'ASC')->get('warehouse');
+    if($active)
+    {
+      $this->db->where('active', 1);
+    }
+
+    $rs = $this->db->order_by('code', 'ASC')->get('warehouse');
 
     if($rs->num_rows() > 0)
     {
       return $rs->result();
     }
 
-    return FALSE;
+    return NULL;
   }
 
 
