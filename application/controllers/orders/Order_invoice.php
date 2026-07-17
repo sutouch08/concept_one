@@ -1048,7 +1048,7 @@ class Order_invoice extends PS_Controller
                       break;
                     }
 
-                    $LineTotal = $ds->vat_type == 'E' ? $rs->total_amount : remove_vat($rs->total_amount, $rs->vat_rate);
+                    $LineTotal = $ds->vat_type == 'I' ? remove_vat($rs->total_amount, $rs->vat_rate) : $rs->total_amount;
 
                     $arr = array(
                       'bookcode' => $bookcode,
@@ -1062,15 +1062,15 @@ class Order_invoice extends PS_Controller
                       'ItemCode' => $rs->product_code,
                       'Dscription' => $rs->product_name,
                       'Qty' => $rs->qty,
-                      'Price' => $ds->vat_type == 'E' ? $rs->final_price : remove_vat($rs->final_price, $rs->vat_rate), //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
+                      'Price' => $ds->vat_type == 'I' ? remove_vat($rs->final_price, $rs->vat_rate) : $rs->final_price, //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
                       'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price),
-                      'PriceBefDi' => $ds->vat_type == 'E' ? $rs->price : remove_vat($rs->price, $rs->vat_rate), //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
+                      'PriceBefDi' => $ds->vat_type == 'I' ? remove_vat($rs->price, $rs->vat_rate) : $rs->price, //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
                       'LineTotal' => $LineTotal,
                       'VatType' => $ds->vat_type,
-                      'VatCode' => $rs->vat_code,
-                      'VatRate' => $rs->vat_rate,
+                      'VatCode' => $ds->vat_type == 'N' ? 'S00' : $rs->vat_code,
+                      'VatRate' => $ds->vat_type == 'N' ? 0 : $rs->vat_rate,
                       'PriceAfVAT' => $ds->vat_type == 'E' ? add_vat($rs->final_price, $rs->vat_rate) : $rs->final_price,
-                      'VatSum' => $rs->vat_amount,
+                      'VatSum' => $ds->vat_type == 'N' ? 0 : $rs->vat_amount,
                       'unitMsr' => $rs->unit_code,
                       'avgBillDiscAmount' => $rs->avgBillDiscAmount,
                       'sumBillDiscAmount' => $rs->sumBillDiscAmount,
@@ -1086,7 +1086,7 @@ class Order_invoice extends PS_Controller
                     if($this->order_invoice_model->add_detail($arr))
                     {
                       $totalBefDisc += $rs->total_amount;
-                      $VatSum += $rs->vat_amount;
+                      $VatSum += $ds->vat_type == 'N' ? 0 : $rs->vat_amount;
                       $DiscSum += $rs->sumBillDiscAmount;
                       $lineNum++;
 
@@ -1676,7 +1676,7 @@ class Order_invoice extends PS_Controller
                     break;
                   }
 
-                  $LineTotal = $ds->vat_type == 'E' ? $rs->total_amount : remove_vat($rs->total_amount, $rs->VatRate);
+                  $LineTotal = $ds->vat_type == 'I' ? remove_vat($rs->total_amount, $rs->VatRate) : $rs->total_amount;
 
                   $arr = array(
                     'bookcode' => $bookcode,
@@ -1690,15 +1690,15 @@ class Order_invoice extends PS_Controller
                     'ItemCode' => $rs->product_code,
                     'Dscription' => $rs->product_name,
                     'Qty' => $rs->qty,
-                    'Price' => $ds->vat_type == 'E' ? $rs->sell : remove_vat($rs->sell, $rs->VatRate), //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
+                    'Price' => $ds->vat_type == 'I' ? remove_vat($rs->sell, $rs->VatRate) : $rs->sell, //-- ราคาขายหลังส่วนลดรายการ ไม่รวม VAT
                     'DiscPrcnt' => discountAmountToPercent($rs->discount_amount, $rs->qty, $rs->price),
-                    'PriceBefDi' => $ds->vat_type == 'E' ? $rs->price : remove_vat($rs->price, $rs->VatRate), //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
+                    'PriceBefDi' => $ds->vat_type == 'I' ? remove_vat($rs->price, $rs->VatRate) : $rs->price, //$rs->PriceBefDi,  //-- ราคาขายก่อนส่วนลดรายการและVAT
                     'LineTotal' => $LineTotal,
                     'VatType' => $ds->vat_type,
-                    'VatCode' => $rs->VatCode,
-                    'VatRate' => $rs->VatRate,
+                    'VatCode' => $ds->vat_type == 'N' ? 'S00' : $rs->VatCode,
+                    'VatRate' => $ds->vat_type == 'N' ? 0 : $rs->VatRate,
                     'PriceAfVAT' => $ds->vat_type == 'E' ? add_vat($rs->sell, $rs->VatRate) : $rs->sell,
-                    'VatSum' => $rs->VatSum,
+                    'VatSum' => $ds->vat_type == 'N' ? 0 : $rs->VatSum,
                     'unitMsr' => $this->products_model->get_unit_code($rs->product_code),
                     'avgBillDiscAmount' => $rs->avgBillDiscAmount,
                     'sumBillDiscAmount' => $rs->sumBillDiscAmount,
@@ -1714,7 +1714,7 @@ class Order_invoice extends PS_Controller
                   if ($this->order_invoice_model->add_detail($arr))
                   {
                     $totalBefDisc += $rs->total_amount;
-                    $VatSum += $rs->VatSum;
+                    $VatSum += $ds->vat_type == 'N' ? 0 : $rs->VatSum;
                     $DiscSum += $rs->sumBillDiscAmount;
                     $lineNum++;
 
